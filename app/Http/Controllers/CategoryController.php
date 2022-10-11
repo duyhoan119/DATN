@@ -18,21 +18,4 @@ class CategoryController extends Controller
         }
         return false;
     }
-
-    public function getCategoryById($id)
-    {
-        $data = Category::find($id);
-        if ($data !== null) {
-            return response()->json($data, 200);
-        }
-
-        return [];
-    }
-
-    public function saved(CategoryRequest $request, $id)
-    {
-        $updateCategoryData = $request->all();
-        $category = Category::find($id);
-        $category->saved($updateCategoryData);
-    }
 }

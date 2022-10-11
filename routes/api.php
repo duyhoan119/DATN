@@ -23,5 +23,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('categories',[ProductController::class,'index']);
 Route::post('categories',[CategoryController::class,'save']);
-Route::get('categories/{id}',[CategoryController::class,'getCategoryById']);
-Route::put('categories/{id}',[CategoryController::class,'saved']);
