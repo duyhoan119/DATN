@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,3 +23,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('categories',[ProductController::class,'index']);
 Route::post('categories',[CategoryController::class,'save']);
+Route::get('categories/{id}',[CategoryController::class,'getCategoryById']);
+Route::put('categories/{id}',[CategoryController::class,'saved']);
