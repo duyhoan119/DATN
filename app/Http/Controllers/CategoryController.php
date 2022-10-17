@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Resources\UpdateCategoryResource;
 use App\Models\Category;
 
 class CategoryController extends Controller
@@ -19,7 +20,7 @@ class CategoryController extends Controller
 
     public function getCategory($id)
     {
-        return response()->json(Category::find($id), 200);
+        return new UpdateCategoryResource(Category::find($id));
     }
 
     public function store($id,UpdateCategoryRequest $request)
