@@ -15,8 +15,6 @@ return new class extends Migration
     {
         Schema::create('import_shipment_detail', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products');
             $table->unsignedBigInteger('import_shipment_id');
             $table->foreign('import_shipment_id')->references('id')->on('import_shipments');
             $table->integer('quantity');
