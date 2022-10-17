@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
-use Illuminate\Auth\Events\Validated;
 
 class CategoryController extends Controller
 
