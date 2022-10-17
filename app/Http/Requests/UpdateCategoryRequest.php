@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CategoryRequest extends FormRequest
+class UpdateCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,9 +31,11 @@ class CategoryRequest extends FormRequest
           'name'=> [
             'required',
             'string',
-            'unique:categories',
             'max:100',
             'min:2'
+          ],
+          'parent_id'=>[
+            'nullable'
           ]
         ];
     }
@@ -47,6 +49,7 @@ class CategoryRequest extends FormRequest
             'name.min' => 'Tên phải có ít nhất 2 kí tự'
         ];
     }
+
 
     protected function failedValidation(Validator $validator)
     {
