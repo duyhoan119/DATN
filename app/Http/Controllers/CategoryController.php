@@ -14,7 +14,7 @@ class CategoryController extends Controller
     public function save(CategoryRequest $request)
     {
         if (Category::insert($request->all())) {
-            return Response();
+            return true;
         }
         return false;
     }
