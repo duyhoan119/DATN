@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Product; 
 use App\Models\Category; 
 
+// php artisan db:seed
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -22,7 +23,7 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        Category::factory(10)->create();
-        // Product::factory(10)->create();
+        // Category::factory(10)->create();
+        Product::factory(10)->create();
     }
 }

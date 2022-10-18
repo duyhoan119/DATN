@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -14,17 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('export_shipments', function (Blueprint $table) {
+        Schema::create('import_shipments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('supplier_id');
+            $table->foreign('supplier_id')->references('id')->on('suppliers');
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products');
-            $table->string('address');
-            $table->string('receve_phone');
-            $table->float('totall_price');
+            $table->timestamp('import_date');
             $table->integer('quantity');
-            $table->timestamp('export_date');
+            $table->float('import_price_totail');
             $table->timestamps();
         });
     }
@@ -36,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('export_shipments');
+        Schema::dropIfExists('import_shipments');
     }
 };
