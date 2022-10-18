@@ -20,6 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('category/{id}',[CategoryController::class,'getCategory']);
-Route::post('category/{id}',[CategoryController::class,'store']);
+Route::put('category/{id}',[CategoryController::class,'store']);
 Route::get('categories',[ProductController::class,'index']);
 Route::post('categories',[CategoryController::class,'save']);
