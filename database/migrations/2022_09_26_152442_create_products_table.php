@@ -4,6 +4,7 @@ use App\Models\Category;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('categories');
             $table->string('name');
             $table->string('sku');
+            // $table->char('sku',10)->primary();
             $table->float('import_price');
             $table->float('price');
             $table->integer('quantity');

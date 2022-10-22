@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Foundation\Http\FormRequest; 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -13,7 +17,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -31,22 +35,21 @@ class UpdateProductRequest extends FormRequest
                 'max:100',
                 'min:2'
               ],
-            'price' => [
-                'required',
-                'float',
-                'max:10',
-                'min:3'
-            ], 
-            'quantity' => [
-                'required',
-                'integer',
-                'max:5',
-                'min:1'
-            ],  
+            // 'price' => [
+            //     'required',
+            //     'float',
+            //     'max:10',
+            //     'min:3'
+            // ], 
+            // 'quantity' => [
+            //     'required',
+            //     'integer',
+            //     'max:5',
+            //     'min:1'
+            // ],  
 
         ];
-    }  
-    // Cấu hình nội dung messages theo rules bên trên
+    }   
     public function messages()
     {
         return [
@@ -55,13 +58,21 @@ class UpdateProductRequest extends FormRequest
             'name.max' => 'Tên sản phẩm không quá 100 kí tự',
             'name.min' => 'Tên sản phẩm tối thiểu 2 kí tự',
 
-            'price.required'=>'giá sản phẩm không được bỏ trống', 
-            'price.max' => 'giá sản phẩm không quá 10 kí tự',
-            'price.min' => 'giá sản phẩm tối thiểu 3 kí tự',
+            // 'price.required'=>'giá sản phẩm không được bỏ trống', 
+            // 'price.max' => 'giá sản phẩm không quá 10 kí tự',
+            // 'price.min' => 'giá sản phẩm tối thiểu 3 kí tự',
 
-            'quantity.required'=>'số lượng sản phẩm không được bỏ trống', 
-            'quantity.max' => 'số lượng sản phẩm không quá 5 kí tự',
-            'quantity.min' => 'số lượng sản phẩm tối thiểu 1 kí tự',
+            // 'quantity.required'=>'số lượng sản phẩm không được bỏ trống', 
+            // 'quantity.max' => 'số lượng sản phẩm không quá 5 kí tự',
+            // 'quantity.min' => 'số lượng sản phẩm tối thiểu 1 kí tự',
         ];
     }  
+protected function failedValidation(Validator $validator)
+    {
+        $errors = (new ValidationException($validator))->errors();
+
+        throw new HttpResponseException(
+            response()->json(['errors' => $errors], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+        );
+    }
 }
