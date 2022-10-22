@@ -17,15 +17,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products');
             $table->string('name');
             $table->string('sku');
             $table->float('import_price');
             $table->float('price');
-            $table->integer('quantity');
-            $table->string('description')->nullable();
-            $table->unsignedBigInteger('status');
-            $table->string('image')->nullable();
-            $table->tinyInteger('warranty_date')->nullable();
             $table->timestamps();
         });
     }
