@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Attribute extends Model
+class ImportShipmentDetail extends Model
 {
     use HasFactory;
-<<<<<<< HEAD
-=======
-    
->>>>>>> develop
+    public $table = "import_shipment_detail";
+
     protected $fillable = [
-        'name',
-        'parent_id'
+        'product_id',
+        'import_shipment_id',
+        'quantity',
+        'import_price',
     ];
 }

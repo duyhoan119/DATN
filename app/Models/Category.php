@@ -10,6 +10,10 @@ class Category extends Model
 
     protected $fillable = [
         'name',
+<<<<<<< HEAD
         'parent_category_id'
+=======
+        'parent_id'
+>>>>>>> develop
     ];
 }

@@ -12,6 +12,7 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+<<<<<<< HEAD
         'category_id',
         'sku',
         'import_price',
@@ -23,3 +24,15 @@ class Product extends Model
         'warranty_date',
     ];
 }
+=======
+        'sku',
+        'category_id',
+        'impost_price',
+        'price',
+        'quantity',
+        'description',
+        'status',
+        'warranty_date',
+    ];
+}
+>>>>>>> develop

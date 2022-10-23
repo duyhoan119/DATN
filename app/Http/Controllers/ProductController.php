@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+<<<<<<< HEAD
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\http\Requests\ProductRequest;
@@ -66,3 +67,16 @@ class ProductController extends Controller
         }
     }
 }  
+=======
+
+use App\Http\Resources\CategoriesResource;
+use App\Models\Product;
+
+class ProductController extends Controller
+{
+    public function index()
+    {
+        return new CategoriesResource(Product::paginate(10));
+    }
+}
+>>>>>>> develop

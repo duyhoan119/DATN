@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Attribute extends Model
+class ExportShipment extends Model
 {
     use HasFactory;
-<<<<<<< HEAD
-=======
-    
->>>>>>> develop
+
     protected $fillable = [
-        'name',
-        'parent_id'
+        'user_id',
+        'address',
+        'receive_phone',
+        'export_date',
+        'totail_price',
     ];
 }
