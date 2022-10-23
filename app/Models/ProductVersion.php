@@ -13,7 +13,7 @@ class ProductVersion extends Model
         'name',
         'category_id',
         'product_id',
-        'impost_price',
+        'import_price',
         'price',
         'sku',
     ];

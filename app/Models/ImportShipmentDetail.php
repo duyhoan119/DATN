@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ImportShipmentDetail extends Model
 {
     use HasFactory;
+    public $table = "import_shipment_detail";
 
     protected $fillable = [
         'product_id',

@@ -11,9 +11,9 @@ class ImportShipment extends Model
 
     protected $fillable = [
         'supplier_id',
-        'category_id',
-        'status',
+        'product_id',
         'import_date',
-        'import_price_totai',
+        'quantity',
+        'import_price_totail',
     ];
 }
