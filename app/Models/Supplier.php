@@ -13,5 +13,4 @@ class Supplier extends Model
         'name',
         'address'
     ];
-
 }
