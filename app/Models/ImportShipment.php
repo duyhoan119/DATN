@@ -5,19 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class ImportShipment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'sku',
-        'category_id',
-        'impost_price',
-        'price',
+        'supplier_id',
+        'product_id',
+        'import_date',
         'quantity',
-        'description',
-        'status',
-        'warranty_date',
+        'import_price_totail',
     ];
 }
