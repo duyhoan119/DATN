@@ -15,9 +15,9 @@ class AttributeController extends Controller
     { 
         $name = $request->get('name');
         if($name){
-            return Response()->json(Attribute::where('name','like','%'.$name.'%')->paginate(10),200);   
+            return Response()->json(Attribute::where('status', '=', 1)->where('name','like','%'.$name.'%')->paginate(10),200);   
         }else{
-            return Response()->json(Attribute::paginate(10),200); 
+            return Response()->json(Attribute::where('status', '=', 1)->paginate(10),200); 
         }  
     }  
     public function save(AttributeRequest $request)
@@ -30,7 +30,7 @@ class AttributeController extends Controller
 
     public function getAttribute($id)
     {
-        return new UpdateAttributeResource(Attribute::find($id));
+        return new UpdateAttributeResource(Attribute::where('status', '=', 1)->find($id));
     }
 
     public function store($id,UpdateAttributeRequest $request)
@@ -38,13 +38,13 @@ class AttributeController extends Controller
         return Attribute::query()->find($id)->update($request->Validated());
     }
     public function delete($id) {
-        if ($id) {
-            $attribute = Attribute::find($id);
-            
-            if ($attribute->delete()) {
-                // return redirect()->back();
-                return true;
-            }
-        } 
+        if (!empty($id)) {
+            $Attribute = Attribute::where('id', '=', $id);
+            $data = [
+                'status' => 0
+            ];
+            $Attribute->update($data);
+            return true;
+        }
     }
 }

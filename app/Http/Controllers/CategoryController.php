@@ -27,4 +27,15 @@ class CategoryController extends Controller
     {
         return Category::query()->find($id)->update($request->Validated());
     }
+
+    public function delete($id) {
+        if (!empty($id)) {
+            $Category = Category::where('id', '=', $id);
+            $data = [
+                'status' => 0
+            ];
+            $Category->update($data);
+            return true;
+        }
+    }
 }
