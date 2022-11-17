@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\AttributeProductController;
 use App\Http\Controllers\Api\SupplierController;
 
 /*
@@ -37,14 +38,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::put('attributes/{id}',[AttributeController::class,'store']);
     Route::delete('attributes/{id}',[AttributeController::class,'delete']);
 
-Route::resource('suppliers', SupplierController::class);
-Route::get('category/{id}',[CategoryController::class,'getCategory']);
-Route::put('category/{id}',[CategoryController::class,'store']);
-Route::get('categories',[ProductController::class,'index']);
-Route::post('categories',[CategoryController::class,'save']);
-Route::prefix('import-shipment')->group(function () {
-    Route::post('/',[ImportShipmentController::class,'save']);
-    Route::get('/{import_id}',[ImportShipmentController::class,'getDetail']);
-    Route::get('/',[ImportShipmentController::class,'index']);
-});
+    // attribute_product
+    Route::get('attribute-products',[AttributeProductController::class,'index']);
+    Route::post('attribute-products',[AttributeProductController::class,'save']);
+    Route::get('attribute-products/{id}',[AttributeProductController::class,'getAttributeProduct']);
+    Route::put('attribute-products/{id}',[AttributeProductController::class,'store']);
+    Route::delete('attribute-products/{id}',[AttributeProductController::class,'delete']);
+
+    Route::resource('suppliers', SupplierController::class);
+    Route::get('category/{id}',[CategoryController::class,'getCategory']);
+    Route::put('category/{id}',[CategoryController::class,'store']);
+    Route::get('categories',[ProductController::class,'index']);
+    Route::post('categories',[CategoryController::class,'save']);
+
+    Route::prefix('import-shipment')->group(function () {
+        Route::post('/',[ImportShipmentController::class,'save']);
+        Route::get('/{import_id}',[ImportShipmentController::class,'getDetail']);
+        Route::get('/',[ImportShipmentController::class,'index']);
+    });
 

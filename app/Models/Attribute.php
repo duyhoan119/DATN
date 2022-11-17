@@ -7,11 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attribute extends Model
 {
-    use HasFactory;
-<<<<<<< HEAD
-=======
+    use HasFactory; 
     
->>>>>>> develop
     protected $fillable = [
         'name',
         'parent_id'
