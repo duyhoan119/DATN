@@ -11,7 +11,6 @@ class ProductVersion extends Model
 
     protected $fillable = [
         'name',
-        'category_id',
         'product_id',
         'import_price',
         'price',

@@ -17,10 +17,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('supplier_id');
             $table->foreign('supplier_id')->references('id')->on('suppliers');
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products');
-            $table->timestamp('import_date');
+            $table->string('import_date');
             $table->integer('quantity');
+            $table->string('import_code');
             $table->float('import_price_totail');
             $table->timestamps();
         });
