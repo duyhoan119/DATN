@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('attribute_id');
             $table->foreign('attribute_id')->references('id')->on('attributes');
             $table->float('price');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }
