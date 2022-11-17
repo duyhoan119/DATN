@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('import_date');
             $table->integer('quantity');
             $table->float('import_price_totail');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

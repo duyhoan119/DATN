@@ -16,41 +16,37 @@ class ProductController extends Controller
         $keyword = $request->get('keyword' ); 
 
         if($keyword){
-            return Response()->json(Product::where('name','like','%'.$keyword.'%')->paginate(10),200);   
+            return Response()->json(Product::where('status', '=', 1)->where('name','like','%'.$keyword.'%')->paginate(10),200);   
         }else if($keyword){
-            return Response()->json(Product::where('sku','like','%'.$keyword.'%')->paginate(10),200);   
+            return Response()->json(Product::where('status', '=', 1)->where('sku','like','%'.$keyword.'%')->paginate(10),200);   
         }else{
-            return Response()->json(Product::paginate(10),200); 
+            return Response()->json(Product::where('status', '=', 1)->paginate(10),200); 
         }
     } 
     public function save(ProductRequest $request){  
         $sku = Str::random(10);
         $product = new product(); 
         $product->fill($request->all()); 
-        $product->sku = $sku;
-        dd($product); 
-        $product->save();
-        // return redirect()->route('products.list'); 
-        // if(Product::insert($request->all() )){
-        //     return true;
-        // }
-        // return true;
+        $product->sku = $sku; 
+        $product->save(); 
+        return $product;
     } 
     public function getProduct($id)
     {
-        return new UpdateProductResource(Product::find($id));
+        return new UpdateProductResource(Product::where('status', '=', 1)->find($id));
     } 
     public function store($id, UpdateProductRequest $request)
     { 
         return Product::query()->find($id)->update($request->Validated());
     }
     public function delete($id) {
-        if ($id) {
-            $product = Product::find($id);
-            if ($product->delete()) {
-                // return redirect()->back();
-                return true;
-            }
+        if (!empty($id)) {
+            $Product = Product::where('id', '=', $id);
+            $data = [
+                'status' => 0
+            ];
+            $Product->update($data);
+            return true;
         }
     }
 }   

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('import_shipment_id')->references('id')->on('import_shipments');
             $table->integer('quantity');
             $table->float('import_price');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

@@ -14,7 +14,7 @@ class AttributeProductController extends Controller
 {
     public function index(Request $request)
     {
-        return Response()->json(AttributeProduct::paginate(10), 200);
+        return Response()->json(AttributeProduct::where('status', '=', 1)->paginate(10), 200);
     }
 
     public function save(AttributeProductRequest $request)
@@ -27,7 +27,7 @@ class AttributeProductController extends Controller
 
     public function getAttributeProduct($id)
     {
-        return new UpdateAttributeProductResource(AttributeProduct::find($id));
+        return new UpdateAttributeProductResource(AttributeProduct::where('status', '=', 1)->find($id));
     }
 
     public function store($id, UpdateAttributeProductRequest $request)
