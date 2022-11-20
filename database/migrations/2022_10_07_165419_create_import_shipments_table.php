@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('import_shipments', function (Blueprint $table) {
             $table->id();
-            $table->string('import_date');
+            $table->timestamp('import_date');
             $table->unsignedBigInteger('supplier_id');
             $table->foreign('supplier_id')->references('id')->on('suppliers');
             $table->integer('quantity');

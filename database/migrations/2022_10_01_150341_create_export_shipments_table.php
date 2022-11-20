@@ -18,13 +18,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->string('export_code');
-            $table->string('receve_phone');
+            $table->string('receve_phone')->nullable();
             $table->float('totall_price');
             $table->integer('quantity');
-            $table->string('export_date');
-            $table->timestamp('expo rt_date');
+            $table->timestamp('export_date');
             $table->integer('status')->default(1);
             $table->timestamps();
         });

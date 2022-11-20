@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeProductController;
 use App\Http\Controllers\Api\SupplierController;
+use App\Http\Controllers\ExportShipmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,8 +57,8 @@ Route::prefix('import-shipment')->group(function () {
     Route::get('/', [ImportShipmentController::class, 'index']);
 });
 
-Route::prefix('emport-shipment')->group(function () {
-    Route::post('/', [ImportShipmentController::class, 'save']);
-    Route::get('/{import_id}', [ImportShipmentController::class, 'getDetail']);
-    Route::get('/', [ImportShipmentController::class, 'index']);
+Route::prefix('export-shipment')->group(function () {
+    Route::post('/', [ExportShipmentController::class, 'save']);
+    Route::get('/{export_id}', [ExportShipmentController::class, 'getDetail']);
+    Route::get('/', [ExportShipmentController::class, 'index']);
 });

@@ -14,5 +14,11 @@ class ExportShipmentDetail extends Model
         'product_id',
         'quantity',
         'price',
+        'barcode',
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

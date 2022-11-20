@@ -12,8 +12,10 @@ class ExportShipment extends Model
     protected $fillable = [
         'user_id',
         'address',
-        'receive_phone',
+        'export_code',
+        'quantity',
+        'receve_phone',
         'export_date',
-        'totail_price',
+        'totall_price',
     ];
 }

@@ -28,7 +28,7 @@ class ImportShipmentController extends Controller
         $products = collect($createImportShipmentData['products']);
         $createImportShipmentData['import_code'] = $this->GetImportCode();
         $createImportShipmentData['quantity'] = array_sum($products->pluck('quantity')->toArray());
-        $createImportShipmentData['import_price_totail'] = array_sum($products->pluck('import_price')->toArray());
+        $createImportShipmentData['import_price_totail'] = array_sum($this->GetTotallPrice($products));
         if ($importShipment = ImportShipment::query()->create($createImportShipmentData)) {
 
             $importShipmentDetailDatas = $this->getImportShipmentDetailData($importShipment->id, $request->products);
@@ -95,5 +95,16 @@ class ImportShipmentController extends Controller
     {
         $importShipmentDetail = ImportShipmentDetail::query()->where('import_shipment_id', $import_id)->with('product')->get();
         return new ImportShipmentDetailResource($importShipmentDetail);
+    }
+
+    protected function GetTotallPrice($products)
+    {
+        $result = [];
+
+        foreach ($products as $product) {
+            $result[] = $product['quantity'] * $product['import_price'];
+        }
+
+        return $result;
     }
 }
