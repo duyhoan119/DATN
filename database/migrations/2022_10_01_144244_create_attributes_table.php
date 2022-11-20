@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->foreign('parent_id')->references('id')->on('attributes');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });  
     }

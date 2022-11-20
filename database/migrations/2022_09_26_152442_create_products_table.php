@@ -24,9 +24,9 @@ return new class extends Migration
             $table->float('price');
             $table->integer('quantity');
             $table->string('description')->nullable();
-            $table->unsignedBigInteger('status');
             $table->string('image')->nullable();
             $table->tinyInteger('warranty_date')->nullable();
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

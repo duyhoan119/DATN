@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->string('barcode')->nullable();
             $table->float('import_price');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

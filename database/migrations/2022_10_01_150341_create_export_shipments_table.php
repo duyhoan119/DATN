@@ -24,6 +24,8 @@ return new class extends Migration
             $table->float('totall_price');
             $table->integer('quantity');
             $table->string('export_date');
+            $table->timestamp('expo rt_date');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

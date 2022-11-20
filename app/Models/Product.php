@@ -14,7 +14,6 @@ class Product extends Model
         'sku',
         'name',
         'category_id',
-        'supplier_id',
         'import_price',
         'price',
         'quantity',
@@ -23,4 +22,3 @@ class Product extends Model
         'warranty_date',
     ];
 }
-
