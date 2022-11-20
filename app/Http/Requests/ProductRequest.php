@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Rules\CheckCategory;
-use App\Rules\CheckSupplierRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Validation\Validator;
@@ -39,9 +38,6 @@ class ProductRequest extends FormRequest
             ],
             'category_id' => [
                 new CheckCategory
-            ],
-            'supplier_id' => [
-                new CheckSupplierRule
             ],
             'price' => [
                 'integer',

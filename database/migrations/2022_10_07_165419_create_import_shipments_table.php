@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('import_shipments', function (Blueprint $table) {
             $table->id();
+            $table->string('import_date');
             $table->unsignedBigInteger('supplier_id');
             $table->foreign('supplier_id')->references('id')->on('suppliers');
-            $table->string('import_date');
             $table->integer('quantity');
             $table->string('import_code');
             $table->float('import_price_totail');
