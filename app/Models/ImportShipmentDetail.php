@@ -18,4 +18,8 @@ class ImportShipmentDetail extends Model
         'import_price',
         'status'
     ];
+
+    public function product(){
+        return $this->belongsTo(Product::class);
+    }
 }

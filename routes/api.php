@@ -56,7 +56,7 @@ Route::prefix('import-shipment')->group(function () {
     Route::get('/', [ImportShipmentController::class, 'index']);
 });
 
-Route::prefix('import-shipment')->group(function () {
+Route::prefix('emport-shipment')->group(function () {
     Route::post('/', [ImportShipmentController::class, 'save']);
     Route::get('/{import_id}', [ImportShipmentController::class, 'getDetail']);
     Route::get('/', [ImportShipmentController::class, 'index']);
