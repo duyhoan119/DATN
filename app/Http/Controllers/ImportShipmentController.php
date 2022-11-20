@@ -25,15 +25,13 @@ class ImportShipmentController extends Controller
             $product = Product::find($importShipment->product_id);
 
             if ($product->import_price !== $importShipmentDetail->import_price) {
-                $productUpdatedata = [
-                    'quantity' => $product->quantity + $request->quantity,
-                ];
-                $product->save($productUpdatedata);
+                $product->quantity += $request->quantity;
+                $product->save();
             }
-            $productUpdatedata = [
-                'quantity' => $product->quantity + $request->quantity,
-                'import_price' => $request->import_price,
-            ];
+
+            $product->quantity += $request->quantity;
+            $product->import_price = $request->import_price;
+
             $productVersionData = [
                 'name' => $product->name,
                 'import_price' => $product->import_price,
@@ -42,8 +40,9 @@ class ImportShipmentController extends Controller
                 'sku' => $product->sku,
                 'category_id' => $product->category_id
             ];
+
             ProductVersion::query()->create($productVersionData);
-            $product->update($productUpdatedata);
+            $product->save();
         }
     }
 }
