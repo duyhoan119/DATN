@@ -1,12 +1,7 @@
-<<<<<<< HEAD
 <?php
 
 namespace App\Http\Controllers;
 
-=======
-<?php
-namespace App\Http\Controllers;
->>>>>>> develop
 use Illuminate\Support\Str;
 use App\http\Requests\ProductRequest;
 use App\Models\Product;
@@ -36,7 +31,7 @@ class ProductController extends Controller
         $product->save();
         return $product;
     }
-    
+
     public function getProduct($id)
     {
         return new UpdateProductResource(Product::where('status', '=', 1)->find($id));
