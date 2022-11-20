@@ -14,6 +14,8 @@ class ImportShipmentDetail extends Model
         'product_id',
         'import_shipment_id',
         'quantity',
+        'barcode',
         'import_price',
+        'status'
     ];
 }
