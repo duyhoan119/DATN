@@ -61,4 +61,5 @@ Route::prefix('export-shipment')->group(function () {
     Route::post('/', [ExportShipmentController::class, 'save']);
     Route::get('/{export_id}', [ExportShipmentController::class, 'getDetail']);
     Route::get('/', [ExportShipmentController::class, 'index']);
+
 });

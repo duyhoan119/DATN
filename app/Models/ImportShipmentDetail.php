@@ -19,8 +19,8 @@ class ImportShipmentDetail extends Model
         'status'
     ];
 
-    public function product()
-    {
+    public function product(){
+
         return $this->belongsTo(Product::class);
     }
 }
