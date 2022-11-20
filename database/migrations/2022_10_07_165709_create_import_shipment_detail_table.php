@@ -17,8 +17,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('import_shipment_id');
             $table->foreign('import_shipment_id')->references('id')->on('import_shipments');
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products');
             $table->integer('quantity');
+            $table->string('barcode')->nullable();
             $table->float('import_price');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

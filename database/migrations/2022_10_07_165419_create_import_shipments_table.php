@@ -15,13 +15,13 @@ return new class extends Migration
     {
         Schema::create('import_shipments', function (Blueprint $table) {
             $table->id();
+            $table->string('import_date');
             $table->unsignedBigInteger('supplier_id');
             $table->foreign('supplier_id')->references('id')->on('suppliers');
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products');
-            $table->timestamp('import_date');
             $table->integer('quantity');
+            $table->string('import_code');
             $table->float('import_price_totail');
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }
@@ -36,3 +36,4 @@ return new class extends Migration
         Schema::dropIfExists('import_shipments');
     }
 };
+
