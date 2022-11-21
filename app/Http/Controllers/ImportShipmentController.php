@@ -11,12 +11,14 @@ use App\Models\ImportShipmentDetail;
 use App\Models\Product;
 use App\Models\ProductVersion;
 use App\Models\Supplier;
+use Carbon\Carbon;
 
 class ImportShipmentController extends Controller
 {
     public function index(SearchImportShipment $request)
     {
         $importShipments = ImportShipment::query()
+            ->with('supplier')
             ->orderBy('created_at', 'DESC')->paginate(15);
         return new ImportShipmentResource($importShipments);
     }
@@ -25,6 +27,7 @@ class ImportShipmentController extends Controller
     {
         $createImportShipmentData = $request->all();
         $products = collect($createImportShipmentData['products']);
+        $createImportShipmentData['import_date'] = Carbon::createFromFormat('d/m/Y', $createImportShipmentData['import_date'])->format('Y-m-d H:i:s');
         $createImportShipmentData['import_code'] = $this->GetImportCode();
         $createImportShipmentData['quantity'] = array_sum($products->pluck('quantity')->toArray());
         $createImportShipmentData['import_price_totail'] = array_sum($this->GetTotallPrice($products));

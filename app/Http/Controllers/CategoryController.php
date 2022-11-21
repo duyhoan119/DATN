@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Resources\CategoriesResource;
 use App\Http\Resources\UpdateCategoryResource;
 use App\Models\Category;
 
@@ -23,12 +24,13 @@ class CategoryController extends Controller
         return new UpdateCategoryResource(Category::find($id));
     }
 
-    public function store($id,UpdateCategoryRequest $request)
+    public function store($id, UpdateCategoryRequest $request)
     {
         return Category::query()->find($id)->update($request->Validated());
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         if (!empty($id)) {
             $Category = Category::where('id', '=', $id);
             $data = [
@@ -37,5 +39,10 @@ class CategoryController extends Controller
             $Category->update($data);
             return true;
         }
+    }
+
+    public function index()
+    {
+        return new CategoriesResource(Category::all());
     }
 }

@@ -48,7 +48,7 @@ Route::delete('attribute-products/{id}', [AttributeProductController::class, 'de
 Route::resource('suppliers', SupplierController::class);
 Route::get('category/{id}', [CategoryController::class, 'getCategory']);
 Route::put('category/{id}', [CategoryController::class, 'store']);
-Route::get('categories', [ProductController::class, 'index']);
+Route::get('categories', [CategoryController::class, 'index']);
 Route::post('categories', [CategoryController::class, 'save']);
 
 Route::prefix('import-shipment')->group(function () {

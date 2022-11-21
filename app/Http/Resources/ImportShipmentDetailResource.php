@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Models\ImportShipmentDetail;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class ImportShipmentDetailResource extends JsonResource
 {
@@ -14,6 +16,18 @@ class ImportShipmentDetailResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return[
+            'data' => $this->resource->map(fn (ImportShipmentDetail $importShipmentDetail) => [
+                'product_id' => $importShipmentDetail->product_id,
+                'product_name' => $importShipmentDetail->product->name,
+                'import_shipment_id' => $importShipmentDetail->import_shipment_id,
+                'quantity' => $importShipmentDetail->quantity,
+                'barcode' => $importShipmentDetail->barcode,
+                'import_price' => $importShipmentDetail->import_price,
+                'status' => $importShipmentDetail->status,
+                'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $importShipmentDetail->created_at)->format('d/m/Y'),
+                'updated_at' => Carbon::createFromFormat('Y-m-d H:i:s', $importShipmentDetail->updated_at)->format('d/m/Y')
+            ])
+            ];
     }
 }

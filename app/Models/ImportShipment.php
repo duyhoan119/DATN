@@ -16,4 +16,9 @@ class ImportShipment extends Model
         'import_code',
         'import_price_totail',
     ];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 }

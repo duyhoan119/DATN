@@ -18,4 +18,9 @@ class ExportShipment extends Model
         'export_date',
         'totall_price',
     ];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 }
