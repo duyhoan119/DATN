@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoriesResource;
 use App\Http\Resources\UpdateCategoryResource;
 use App\Models\Category;
+use App\Models\Product;
 
 class CategoryController extends Controller
 
@@ -31,14 +32,22 @@ class CategoryController extends Controller
 
     public function delete($id)
     {
-        if (!empty($id)) {
-            $Category = Category::where('id', '=', $id);
-            $data = [
-                'status' => 0
-            ];
-            $Category->update($data);
+        if (Product::query()->where('category_id', $id)->exists()) {
+            $products = Product::query()->where('category_id', $id)->get();
+            foreach ($products as $product) {
+                $product['category_id'] = 0;
+                $product->save();
+            }
+            if (Category::destroy($id)) {
+                return true;
+            }
+            return false;
+        }
+
+        if (Category::destroy($id)) {
             return true;
         }
+        return false;
     }
 
     public function index()

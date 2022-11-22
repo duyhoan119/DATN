@@ -9,12 +9,14 @@ use App\Http\Resources\ExportShipmentResource;
 use App\Models\ExportShipment;
 use App\Models\ExportShipmentDetail;
 use App\Models\Product;
+use Carbon\Carbon;
 
 class ExportShipmentController extends Controller
 {
     public function index(SearchExportShipment $request)
     {
         $importShipments = ExportShipment::query()
+            ->with('user')
             ->orderBy('created_at', 'DESC')->paginate(15);
         return new ExportShipmentResource($importShipments);
     }
@@ -26,6 +28,7 @@ class ExportShipmentController extends Controller
         $createExportShipmentData['export_code'] = $this->GetExportCode();
         $createExportShipmentData['quantity'] = array_sum($products->pluck('quantity')->toArray());
         $createExportShipmentData['totall_price'] = array_sum($this->GetTotallPrice($products));
+        $createExportShipmentData['export_date'] = Carbon::createFromFormat('d/m/Y', $createExportShipmentData['export_date'])->format('Y-m-d H:i:s');
         if ($exportShipment = ExportShipment::query()->create($createExportShipmentData)) {
 
             $exportShipmentDetailDatas = $this->getExportShipmentDetailData($exportShipment->id, $request->products);
