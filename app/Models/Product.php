@@ -20,5 +20,8 @@ class Product extends Model
         'description',
         'status',
         'warranty_date',
-    ];
-}
+    ]; 
+    public function Category(){
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    } 
+}   
