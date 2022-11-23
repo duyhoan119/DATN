@@ -1,71 +1,55 @@
 <?php
 
-namespace App\Http\Controllers;
+/*
+|--------------------------------------------------------------------------
+| Create The Application
+|--------------------------------------------------------------------------
+|
+| The first thing we will do is create a new Laravel application instance
+| which serves as the "glue" for all the components of Laravel, and is
+| the IoC container for the system binding all of the various parts.
+|
+*/
 
-use Illuminate\Support\Str;
-use App\http\Requests\ProductRequest;
-use App\Models\Product;
-use Illuminate\Http\Request;
-use App\Http\Requests\UpdateProductRequest;
-use App\Http\Resources\UpdateProductResource;
+$app = new Illuminate\Foundation\Application(
+    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
+);
 
-class ProductController extends Controller
-{
-    public function index(Request $request)
-    { 
-        $keyword = $request->get('keyword');
+/*
+|--------------------------------------------------------------------------
+| Bind Important Interfaces
+|--------------------------------------------------------------------------
+|
+| Next, we need to bind some important interfaces into the container so
+| we will be able to resolve them when needed. The kernels serve the
+| incoming requests to this application from both the web and CLI.
+|
+*/
 
-        if ($keyword) {
-            return Response()->json(Product::where('status', '=', 1)->where('name', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        } else if ($keyword) {
-            return Response()->json(Product::where('status', '=', 1)->where('sku', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        } else {
-            return Response()->json(Product::where('status', '=', 1)->paginate(10), 200);
-        }
-    }
+$app->singleton(
+    Illuminate\Contracts\Http\Kernel::class,
+    App\Http\Kernel::class
+);
 
-    public function save(ProductRequest $request) 
-    {
-        $product = new product(); 
-        $product->fill($request->all());  
-        $product->image = $request->image;
+$app->singleton(
+    Illuminate\Contracts\Console\Kernel::class,
+    App\Console\Kernel::class
+);
 
-        $KiTuDau = strtoupper(substr($product->Category->name, 0 ,2)); 
-        $KiTuRandom = Str::random(10);
-        $sku = "$KiTuDau  $KiTuRandom"; 
-        $product->sku = $sku; 
+$app->singleton(
+    Illuminate\Contracts\Debug\ExceptionHandler::class,
+    App\Exceptions\Handler::class
+);
 
-        if ($request->file('image')) { 
-            $product['image'] = $this->uploadFile($request->file('image'));
-        } 
-        dd($product);   
-        $product->save();
-        return $product;
-    }
- 
-    public function uploadFile($file)
-    { 
-            $filename =  time() . '_' . $file->getClientOriginalName();
-            return $file->storeAs('imagesProduct', $filename,  'public'); 
-    }
- 
-    public function getProduct($id)
-    {
-        return new UpdateProductResource(Product::where('status', '=', 1)->find($id));
-    }
+/*
+|--------------------------------------------------------------------------
+| Return The Application
+|--------------------------------------------------------------------------
+|
+| This script returns the application instance. The instance is given to
+| the calling script so we can separate the building of the instances
+| from the actual running of the application and sending responses.
+|
+*/
 
-    public function store($id, UpdateProductRequest $request)
-    {
-        return Product::query()->find($id)->update($request->Validated());
-    } 
-    public function delete($id) { 
-        if (!empty($id)) {
-            $Product = Product::where('id', '=', $id);
-            $data = [
-                'status' => 0
-            ];
-            $Product->update($data);
-            return true;
-        }
-    }
-}
+return $app;
