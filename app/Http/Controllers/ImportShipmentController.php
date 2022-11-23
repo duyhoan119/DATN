@@ -3,47 +3,110 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportShipmentRepuest;
+use App\Http\Requests\SearchImportShipment;
+use App\Http\Resources\ImportShipmentDetailResource;
+use App\Http\Resources\ImportShipmentResource;
 use App\Models\ImportShipment;
 use App\Models\ImportShipmentDetail;
 use App\Models\Product;
 use App\Models\ProductVersion;
-use Illuminate\Http\JsonResponse;
+use App\Models\Supplier;
+use Carbon\Carbon;
 
 class ImportShipmentController extends Controller
 {
+    public function index(SearchImportShipment $request)
+    {
+        $importShipments = ImportShipment::query()
+            ->with('supplier')
+            ->orderBy('created_at', 'DESC')->paginate(15);
+        return new ImportShipmentResource($importShipments);
+    }
+
     public function save(ImportShipmentRepuest $request)
     {
+        $createImportShipmentData = $request->all();
+        $products = collect($createImportShipmentData['products']);
+        $createImportShipmentData['import_date'] = Carbon::createFromFormat('d/m/Y', $createImportShipmentData['import_date'])->format('Y-m-d H:i:s');
+        $createImportShipmentData['import_code'] = $this->GetImportCode();
+        $createImportShipmentData['quantity'] = array_sum($products->pluck('quantity')->toArray());
+        $createImportShipmentData['import_price_totail'] = array_sum($this->GetTotallPrice($products));
+        if ($importShipment = ImportShipment::query()->create($createImportShipmentData)) {
 
-        if ($importShipment = ImportShipment::query()->create($request->all())) {
+            $importShipmentDetailDatas = $this->getImportShipmentDetailData($importShipment->id, $request->products);
 
-            $importShipmentDetailData = [
-                'import_shipment_id' => $importShipment->id,
-                'quantity' => $request->quantity,
-                'import_price' => $request->import_price
-            ];
-            $importShipmentDetail = ImportShipmentDetail::query()->create($importShipmentDetailData);
-            $product = Product::find($importShipment->product_id);
+            foreach ($importShipmentDetailDatas as $importShipmentDetailData) {
 
-            if ($product->import_price !== $importShipmentDetail->import_price) {
-                $productUpdatedata = [
-                    'quantity' => $product->quantity + $request->quantity,
-                ];
-                $product->save($productUpdatedata);
+                $importShipmentDetail = ImportShipmentDetail::query()->create($importShipmentDetailData);
+
+                $product = Product::find($importShipmentDetail->product_id);
+
+                if ($product->import_price != $importShipmentDetail->import_price) {
+                    $productVersionData = [
+                        'name' => $product->name,
+                        'import_price' => $product->import_price,
+                        'price' => $product->price,
+                        'product_id' => $product->id,
+                        'sku' => $product->sku,
+                        'category_id' => $product->category_id
+                    ];
+
+                    ProductVersion::query()->create($productVersionData);
+
+                    $product->quantity += $importShipmentDetail->quantity;
+                    $product->import_price = $importShipmentDetail->import_price;
+                    $product->save();
+                }
+                $product->quantity += $importShipmentDetail->quantity;
+                $product->save();
             }
-            $productUpdatedata = [
-                'quantity' => $product->quantity + $request->quantity,
-                'import_price' => $request->import_price,
-            ];
-            $productVersionData = [
-                'name' => $product->name,
-                'import_price' => $product->import_price,
-                'price' => $product->price,
-                'product_id' => $product->id,
-                'sku' => $product->sku,
-                'category_id' => $product->category_id
-            ];
-            ProductVersion::query()->create($productVersionData);
-            $product->update($productUpdatedata);
         }
+
+        return true;
+    }
+
+    protected function GetImportCode()
+    {
+        $latestImportShipment = ImportShipment::latest('id')->first(['id']);
+        $latestId = $latestImportShipment->id ?? 0;
+
+        return 'MNH' . str_pad(++$latestId, 7, '0', STR_PAD_LEFT);
+    }
+
+    protected function getImportShipmentDetailData($importShipmentId, $products)
+    {
+        $result = [];
+
+        foreach ($products as $product) {
+            $item['import_shipment_id'] = $importShipmentId;
+            $item['product_id'] = $product['id'];
+            $item['quantity'] = $product['quantity'];
+            $item['import_price'] = $product['import_price'];
+            $result[] = $item;
+        }
+
+        return $result;
+    }
+
+    protected function GetIdSupplierByKeyword($keyword)
+    {
+        return Supplier::query()->where('name', 'iLIKE', '%' . $keyword . '%');
+    }
+
+    public function getDetail($import_id)
+    {
+        $importShipmentDetail = ImportShipmentDetail::query()->where('import_shipment_id', $import_id)->with('product')->get();
+        return new ImportShipmentDetailResource($importShipmentDetail);
+    }
+
+    protected function GetTotallPrice($products)
+    {
+        $result = [];
+
+        foreach ($products as $product) {
+            $result[] = $product['quantity'] * $product['import_price'];
+        }
+
+        return $result;
     }
 }

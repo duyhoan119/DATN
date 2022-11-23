@@ -24,36 +24,35 @@ class SupplierStore extends FormRequest
     public function rules()
     {
         return [
-            'name'=> [
+            'name' => [
                 'required',
                 'string',
                 'unique:suppliers',
                 'max:100',
                 'min:1'
             ],
-            'address'=> [
+            'address' => [
                 'required',
                 'string',
                 'unique:suppliers',
                 'max:100',
                 'min:1'
-              ]
+            ]
         ];
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
-            'name.required'=>'Tên nhà cung cấp không được bỏ trống',
-            'name.unique'=>'Tên nhà cung cấp đã tồn tại vui lòng chọn tên khác',
+            'name.required' => 'Tên nhà cung cấp không được bỏ trống',
+            'name.unique' => 'Tên nhà cung cấp đã tồn tại vui lòng chọn tên khác',
             'name.max' => 'Tên chỉ đc nhập không quá 100 kí tự',
             'name.min' => 'Tên phải có ít nhất 1 kí tự',
 
-
-                'address.required'=>'Tên nhà cung cấp không được bỏ trống',
-                'address.unique'=>'Tên nhà cung cấp đã tồn tại vui lòng chọn tên khác',
-                'address.max' => 'Tên chỉ đc nhập không quá 100 kí tự',
-                'address.min' => 'Tên phải có ít nhất 1 kí tự'
-
+            'address.required' => 'Tên nhà cung cấp không được bỏ trống',
+            'address.unique' => 'Tên nhà cung cấp đã tồn tại vui lòng chọn tên khác',
+            'address.max' => 'Tên chỉ đc nhập không quá 100 kí tự',
+            'address.min' => 'Tên phải có ít nhất 1 kí tự'
         ];
     }
 }

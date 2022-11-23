@@ -3,18 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use App\http\Requests\ProductRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\UpdateProductResource;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
-    {
+    { 
         $keyword = $request->get('keyword');
 
         if ($keyword) {
@@ -39,19 +37,18 @@ class ProductController extends Controller
 
         if ($request->file('image')) { 
             $product['image'] = $this->uploadFile($request->file('image'));
-        }
-         
-        dd($product);
+        } 
+        dd($product);   
         $product->save();
         return $product;
     }
-
+ 
     public function uploadFile($file)
     { 
             $filename =  time() . '_' . $file->getClientOriginalName();
             return $file->storeAs('imagesProduct', $filename,  'public'); 
     }
-
+ 
     public function getProduct($id)
     {
         return new UpdateProductResource(Product::where('status', '=', 1)->find($id));
@@ -60,10 +57,8 @@ class ProductController extends Controller
     public function store($id, UpdateProductRequest $request)
     {
         return Product::query()->find($id)->update($request->Validated());
-    }
-
-    public function delete($id)
-    {
+    } 
+    public function delete($id) { 
         if (!empty($id)) {
             $Product = Product::where('id', '=', $id);
             $data = [

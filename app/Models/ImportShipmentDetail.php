@@ -14,6 +14,13 @@ class ImportShipmentDetail extends Model
         'product_id',
         'import_shipment_id',
         'quantity',
+        'barcode',
         'import_price',
+        'status'
     ];
+
+    public function product(){
+
+        return $this->belongsTo(Product::class);
+    }
 }
