@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ImportShipmentController;
 use App\Http\Controllers\ProductController;
@@ -9,6 +9,7 @@ use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeProductController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\ExportShipmentController;
+use App\Http\Controllers\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,10 @@ use App\Http\Controllers\ExportShipmentController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/login', [LoginController::class, 'index']);
+Route::post('/login', [LoginController::class, 'Login']);  
+Route::get('/logout', [LoginController::class, 'Logout']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'save']);
