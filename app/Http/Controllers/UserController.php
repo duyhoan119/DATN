@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UpdateUserResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {
@@ -17,6 +19,8 @@ class UserController extends Controller
 
         if ($keyword) {
             return Response()->json(User::where('status', '=', 1)->where('name', 'like', '%' . $keyword . '%')->paginate(10), 200);
+        }else if($keyword){
+            return Response()->json(User::where('status', '=', 1)->where('email', 'like', '%' . $keyword . '%')->paginate(10), 200);
         } else {
             return Response()->json(User::where('status', '=', 1)->paginate(10), 200);
         }
@@ -24,7 +28,12 @@ class UserController extends Controller
 
     public function save(UserRequest $request)
     { 
-        if (User::insert($request->all())) { 
+        $data  = array_merge($request->all(), [
+            'created_at' => date('Y-m-d H:i:s'),
+            'status' => 1,
+            'password' => Hash::make($request->password) 
+        ]); 
+        if (User::insertGetId($data)) { 
             if ($request->file('image')) { 
                 $user['image'] = $this->uploadFile($request->file('image'));
             } 
