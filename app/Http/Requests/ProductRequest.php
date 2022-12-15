@@ -36,16 +36,20 @@ class ProductRequest extends FormRequest
                 'max:100',
                 'min:2'
             ],
+            'import_price' => [
+                'integer',
+                'required' 
+            ], 
             'category_id' => [
                 new CheckCategory
             ],
             'price' => [
                 'integer',
-                'required'
+                'required'  
             ],
             'quantity' => [
                 'integer',
-                'required'
+                'required' 
             ],
         ];
     }
@@ -58,13 +62,16 @@ class ProductRequest extends FormRequest
             'name.min' => 'Tên sản phẩm tối thiểu 2 kí tự',
 
             'price.required'=>'giá sản phẩm không được bỏ trống',
-            'price.integer'=>'giá sản phẩm phải à số',
+            'price.integer'=>'giá sản phẩm phải là số',
             'price.max' => 'giá sản phẩm không quá 10 kí tự',
             'price.min' => 'giá sản phẩm tối thiểu 3 kí tự',
 
             'quantity.required'=>'số lượng sản phẩm không được bỏ trống',
             'quantity.max' => 'số lượng sản phẩm không quá 5 kí tự',
             'quantity.min' => 'số lượng sản phẩm tối thiểu 1 kí tự',
+
+            'import_price.required'=>'giá nhập sản phẩm không được bỏ trống',
+            'import_price.integer'=>'giá nhập sản phẩm phải là số',
         ];
     }
 

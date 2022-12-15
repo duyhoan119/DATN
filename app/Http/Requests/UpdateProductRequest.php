@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CheckCategory; 
 use Illuminate\Foundation\Http\FormRequest; 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Validation\Validator;
@@ -34,37 +35,44 @@ class UpdateProductRequest extends FormRequest
                 'unique:products',
                 'max:100',
                 'min:2'
-              ],
-            // 'price' => [
-            //     'required',
-            //     'float',
-            //     'max:10',
-            //     'min:3'
-            // ], 
-            // 'quantity' => [
-            //     'required',
-            //     'integer',
-            //     'max:5',
-            //     'min:1'
-            // ],  
+            ],
+            'import_price' => [
+                'integer',
+                'required' 
+            ], 
+            'category_id' => [
+                new CheckCategory
+            ],
+            'price' => [
+                'integer',
+                'required'  
+            ],
+            'quantity' => [
+                'integer',
+                'required' 
+            ], 
 
         ];
     }   
     public function messages()
     {
         return [
-            'name.required'=>'Tên sản phẩm không được bỏ trống',
-            'name.unique'=>'Tên sản phẩm đã tồn tại',
+            'name.required' => 'Tên sản phẩm không được bỏ trống',
+            'name.unique' => 'Tên sản phẩm đã tồn tại',
             'name.max' => 'Tên sản phẩm không quá 100 kí tự',
             'name.min' => 'Tên sản phẩm tối thiểu 2 kí tự',
 
-            // 'price.required'=>'giá sản phẩm không được bỏ trống', 
-            // 'price.max' => 'giá sản phẩm không quá 10 kí tự',
-            // 'price.min' => 'giá sản phẩm tối thiểu 3 kí tự',
+            'price.required'=>'giá sản phẩm không được bỏ trống',
+            'price.integer'=>'giá sản phẩm phải là số',
+            'price.max' => 'giá sản phẩm không quá 10 kí tự',
+            'price.min' => 'giá sản phẩm tối thiểu 3 kí tự',
 
-            // 'quantity.required'=>'số lượng sản phẩm không được bỏ trống', 
-            // 'quantity.max' => 'số lượng sản phẩm không quá 5 kí tự',
-            // 'quantity.min' => 'số lượng sản phẩm tối thiểu 1 kí tự',
+            'quantity.required'=>'số lượng sản phẩm không được bỏ trống',
+            'quantity.max' => 'số lượng sản phẩm không quá 5 kí tự',
+            'quantity.min' => 'số lượng sản phẩm tối thiểu 1 kí tự',
+
+            'import_price.required'=>'giá nhập sản phẩm không được bỏ trống',
+            'import_price.integer'=>'giá nhập sản phẩm phải là số',
         ];
     }  
 protected function failedValidation(Validator $validator)

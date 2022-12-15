@@ -10,6 +10,7 @@ use App\Http\Controllers\AttributeProductController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\ExportShipmentController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/login', [LoginController::class, 'index']);
 Route::post('/login', [LoginController::class, 'Login']);  
 Route::get('/logout', [LoginController::class, 'Logout']);
+
+Route::get('/user', [UserController::class, 'index']);
+Route::post('/user', [UserController::class, 'save']);
+Route::get('user/{id}', [UserController::class, 'getUser']);
+Route::put('user/{id}', [UserController::class, 'store']);
+Route::delete('/user/{id}', [UserController::class, 'delete']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'save']);
