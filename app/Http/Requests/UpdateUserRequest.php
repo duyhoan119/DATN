@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CheckRole; 
 use Illuminate\Foundation\Http\FormRequest; 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Validation\Validator;
@@ -51,9 +52,11 @@ class UpdateUserRequest extends FormRequest
                     'min:5'
                 ],
                 'gender' => [
+                    'integer',
                     'required'
                 ], 
                 'role_id' => [
+                    'integer',
                     'required'
                 ], 
             ]; 
@@ -77,10 +80,11 @@ class UpdateUserRequest extends FormRequest
                     'min:5'
                 ],
                 'gender' => [
+                    'integer',
                     'required'
                 ], 
                 'role_id' => [
-                    'required'
+                    new CheckRole
                 ], 
             ];
         }
@@ -98,15 +102,14 @@ class UpdateUserRequest extends FormRequest
             'email.unique'=>'Email đã tồn tại',
             'email.max' => 'Email không quá 255 kí tự',
             'email.min' => 'Email tối thiểu 5 kí tự', 
-            'email.email' => 'Nhập đúng định dạng email', 
-
-            'role_id.required'=>'Vai trò không được bỏ trống',
+            'email.email' => 'Nhập đúng định dạng email',  
 
             'password.required'=>'Mật khẩu không được bỏ trống',
             'password.max' => 'Mật khẩu không quá 255 kí tự',
             'password.min' => 'Mật khẩu tối thiểu 5 kí tự', 
 
-            'gender.required'=>'Giới tính không được bỏ trống', 
+            'gender.required'=>'Giới tính không được bỏ trống',  
+            'gender.integer'=>'Giới tính chưa đúng định dạng', 
         ];
     }  
 

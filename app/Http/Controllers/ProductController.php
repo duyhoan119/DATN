@@ -37,8 +37,7 @@ class ProductController extends Controller
 
         if ($request->file('image')) { 
             $product['image'] = $this->uploadFile($request->file('image'));
-        } 
-        dd($product);   
+        }  
         $product->save();
         return $product;
     }
@@ -56,7 +55,10 @@ class ProductController extends Controller
 
     public function store($id, UpdateProductRequest $request)
     {
-        return Product::query()->find($id)->update($request->Validated());
+        if ($request->file('image')) { 
+            $product['image'] = $this->uploadFile($request->file('image'));
+        }
+        return Product::query()->find($id)->update($request->all());
     } 
     public function delete($id) { 
         if (!empty($id)) {
