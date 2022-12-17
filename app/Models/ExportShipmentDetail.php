@@ -14,7 +14,7 @@ class ExportShipmentDetail extends Model
         'product_id',
         'quantity',
         'price',
-        'barcode',
+        'lot_code',
     ];
 
     public function product()

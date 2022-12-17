@@ -20,6 +20,9 @@ return new class extends Migration
             $table->foreign('supplier_id')->references('id')->on('suppliers');
             $table->integer('quantity');
             $table->string('import_code');
+            $table->integer('import_type');
+            $table->integer('payment');
+            $table->string('description')->nullable();
             $table->float('import_price_totail');
             $table->integer('status')->default(1);
             $table->timestamps();

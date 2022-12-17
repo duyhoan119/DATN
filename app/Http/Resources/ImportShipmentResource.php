@@ -26,8 +26,10 @@ class ImportShipmentResource extends JsonResource
                 'import_code' => $importShipment->import_code,
                 'import_price_totail' => $importShipment->import_price_totail,
                 'status' => $importShipment->status,
-                'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $importShipment->created_at)->format('d/m/Y'),
-                'updated_at' => Carbon::createFromFormat('Y-m-d H:i:s', $importShipment->updated_at)->format('d/m/Y')
+                'import_type' => $importShipment->import_type,
+                'payment' => $importShipment->payment,
+                'created_at' => $importShipment->created_at ? Carbon::createFromFormat('Y-m-d H:i:s', $importShipment->created_at)->format('d/m/Y'):'',
+                'updated_at' => $importShipment->updated_at ? Carbon::createFromFormat('Y-m-d H:i:s', $importShipment->updated_at)->format('d/m/Y'):''
             ])
         ];
     }

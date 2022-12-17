@@ -20,9 +20,8 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('categories');
             $table->string('name');
             $table->string('sku');
-            $table->float('import_price');
             $table->float('price');
-            $table->integer('quantity');
+            $table->integer('quantity')->default(0);
             $table->string('description')->nullable();
             $table->string('image')->nullable();
             $table->tinyInteger('warranty_date')->nullable();

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products');
             $table->integer('quantity');
             $table->float('price');
-            $table->string('barcode')->nullable();
+            $table->string('lot_code')->nullable();
             $table->integer('status')->default(1);
             $table->timestamps();
         });

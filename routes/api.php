@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\ExportShipmentController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrderRefundController;
+use App\Http\Controllers\StatisticalController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +31,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/login', [LoginController::class, 'index']);
-Route::post('/login', [LoginController::class, 'Login']);  
+Route::post('/login', [LoginController::class, 'Login']);
 Route::get('/logout', [LoginController::class, 'Logout']);
 
 Route::get('/user', [UserController::class, 'index']);
@@ -39,7 +42,7 @@ Route::delete('/user/{id}', [UserController::class, 'delete']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'save']);
-Route::get('products/{id}', [ProductController::class, 'getProduct']);
+Route::get('products/{id}', [ProductController::class, 'show']);
 Route::put('products/{id}', [ProductController::class, 'store']);
 Route::delete('/products/{id}', [ProductController::class, 'delete']);
 
@@ -76,3 +79,13 @@ Route::prefix('export-shipment')->group(function () {
     Route::get('/', [ExportShipmentController::class, 'index']);
 
 });
+
+Route::get('/statistical', [StatisticalController::class, 'show']);
+
+Route::prefix('/order-refund')->group(function () {
+    Route::get('/', [OrderRefundController::class, 'index']);
+    Route::post('/', [OrderRefundController::class, 'store']);
+    Route::get('/{order_refund_id}', [OrderRefundController::class, 'show']);
+    Route::get('/{order_refund_id}', [OrderRefundController::class, 'SearchExportShipment']);
+});
+

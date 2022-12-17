@@ -9,7 +9,7 @@ use App\Http\Resources\ImportShipmentResource;
 use App\Models\ImportShipment;
 use App\Models\ImportShipmentDetail;
 use App\Models\Product;
-use App\Models\ProductVersion;
+use App\Models\productDetail;
 use App\Models\Supplier;
 use Carbon\Carbon;
 
@@ -25,9 +25,23 @@ class ImportShipmentController extends Controller
 
     public function save(ImportShipmentRepuest $request)
     {
-        $createImportShipmentData = $request->all();
-        $products = collect($createImportShipmentData['products']);
-        $createImportShipmentData['import_date'] = Carbon::createFromFormat('d/m/Y', $createImportShipmentData['import_date'])->format('Y-m-d H:i:s');
+        $ImportShipmentData = $request->all();
+        $createImportShipmentData = [];
+        if ($ImportShipmentData['import_type'] === 2) {
+            $insertSupplierData = [
+                'name' => $ImportShipmentData['user_name'],
+                'phone_number' => $ImportShipmentData['phone_number']
+            ];
+            $supplier = Supplier::query()->create($insertSupplierData);
+            $createImportShipmentData['supplier_id'] = $supplier->id;
+        } else {
+            $createImportShipmentData['supplier_id'] = $ImportShipmentData['supplier_id'];
+        }
+        $products = collect($ImportShipmentData['products']);
+        $createImportShipmentData['import_date'] = Carbon::createFromFormat('d/m/Y', $ImportShipmentData['import_date'])->format('Y-m-d H:i:s');
+        $createImportShipmentData['import_type'] = $ImportShipmentData['import_type'];
+        $createImportShipmentData['payment'] = $ImportShipmentData['payment'];
+        $createImportShipmentData['description'] = $ImportShipmentData['description'];
         $createImportShipmentData['import_code'] = $this->GetImportCode();
         $createImportShipmentData['quantity'] = array_sum($products->pluck('quantity')->toArray());
         $createImportShipmentData['import_price_totail'] = array_sum($this->GetTotallPrice($products));
@@ -38,25 +52,17 @@ class ImportShipmentController extends Controller
             foreach ($importShipmentDetailDatas as $importShipmentDetailData) {
 
                 $importShipmentDetail = ImportShipmentDetail::query()->create($importShipmentDetailData);
-
                 $product = Product::find($importShipmentDetail->product_id);
 
-                if ($product->import_price != $importShipmentDetail->import_price) {
-                    $productVersionData = [
-                        'name' => $product->name,
-                        'import_price' => $product->import_price,
-                        'price' => $product->price,
-                        'product_id' => $product->id,
-                        'sku' => $product->sku,
-                        'category_id' => $product->category_id
-                    ];
+                $createProductDetailData = [
+                    'product_id' => $product->id,
+                    'import_shipment_detail_id' => $importShipmentDetail->id,
+                    'quantity' => $importShipmentDetail->quantity,
+                    'import_price' => $importShipmentDetail->import_price,
+                    'lot_code' => $importShipmentDetail->lot_code,
+                ];
+                productDetail::query()->create($createProductDetailData);
 
-                    ProductVersion::query()->create($productVersionData);
-
-                    $product->quantity += $importShipmentDetail->quantity;
-                    $product->import_price = $importShipmentDetail->import_price;
-                    $product->save();
-                }
                 $product->quantity += $importShipmentDetail->quantity;
                 $product->save();
             }
@@ -70,7 +76,7 @@ class ImportShipmentController extends Controller
         $latestImportShipment = ImportShipment::latest('id')->first(['id']);
         $latestId = $latestImportShipment->id ?? 0;
 
-        return 'MNH' . str_pad(++$latestId, 7, '0', STR_PAD_LEFT);
+        return 'PN' . ++$latestId;
     }
 
     protected function getImportShipmentDetailData($importShipmentId, $products)
@@ -82,6 +88,7 @@ class ImportShipmentController extends Controller
             $item['product_id'] = $product['id'];
             $item['quantity'] = $product['quantity'];
             $item['import_price'] = $product['import_price'];
+            $item['lot_code'] = $this->getLotCode($importShipmentId);
             $result[] = $item;
         }
 
@@ -107,6 +114,12 @@ class ImportShipmentController extends Controller
             $result[] = $product['quantity'] * $product['import_price'];
         }
 
+        return $result;
+    }
+
+    protected function getLotCode($importShipmentId)
+    {
+        $result = 'ML' . $importShipmentId . '-' . date("Y-m-d");
         return $result;
     }
 }

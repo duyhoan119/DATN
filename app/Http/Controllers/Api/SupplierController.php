@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Supplier;
 use App\Http\Requests\SupplierStore;
 use App\Http\Requests\SupplierUpdate;
+use App\Models\ExportShipment;
+use App\Models\ImportShipment;
 
 class SupplierController extends Controller
 {
@@ -30,7 +32,6 @@ class SupplierController extends Controller
     {
         $data = $request->validated();
         return Supplier::create($data);
-
     }
 
     /**
@@ -39,7 +40,7 @@ class SupplierController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show( Supplier $supplier)
+    public function show(Supplier $supplier)
     {
         return $supplier;
     }
@@ -63,8 +64,22 @@ class SupplierController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy( Supplier $supplier)
+    public function destroy($supplier)
     {
-        return $supplier->delete();
+        $importShipments = ImportShipment::query()->where('supplier_id', $supplier)->get();
+        $exportShipments = ExportShipment::query()->where('supplier_id', $supplier)->get();
+        foreach ($importShipments as $importShipment) {
+            $importShipment['supplier_id'] = 0;
+            $importShipment->save();
+        }
+        foreach ($exportShipments as $exportShipment) {
+            $exportShipment['supplier_id'] = 0;
+            $exportShipment->save();
+        }
+
+        if (Supplier::destroy($supplier)) {
+            return true;
+        }
+        return false;;
     }
 }

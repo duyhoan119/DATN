@@ -16,18 +16,18 @@ class ImportShipmentDetailResource extends JsonResource
      */
     public function toArray($request)
     {
-        return[
+        return [
             'data' => $this->resource->map(fn (ImportShipmentDetail $importShipmentDetail) => [
                 'product_id' => $importShipmentDetail->product_id,
                 'product_name' => $importShipmentDetail->product->name,
                 'import_shipment_id' => $importShipmentDetail->import_shipment_id,
                 'quantity' => $importShipmentDetail->quantity,
-                'barcode' => $importShipmentDetail->barcode,
+                'lot_code' => $importShipmentDetail->lot_code,
                 'import_price' => $importShipmentDetail->import_price,
                 'status' => $importShipmentDetail->status,
-                'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $importShipmentDetail->created_at)->format('d/m/Y'),
-                'updated_at' => Carbon::createFromFormat('Y-m-d H:i:s', $importShipmentDetail->updated_at)->format('d/m/Y')
+                'created_at' => $importShipmentDetail->created_at ? Carbon::createFromFormat('Y-m-d H:i:s', $importShipmentDetail->created_at)->format('d/m/Y') : '',
+                'updated_at' => $importShipmentDetail->updated_at ? Carbon::createFromFormat('Y-m-d H:i:s', $importShipmentDetail->updated_at)->format('d/m/Y') : ''
             ])
-            ];
+        ];
     }
 }

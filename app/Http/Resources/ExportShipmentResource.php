@@ -21,6 +21,7 @@ class ExportShipmentResource extends JsonResource
                 'id' => $exportShipment->id,
                 'user_id' => $exportShipment->user_id,
                 'user_name' => $exportShipment->user->name,
+                'seller_name' => $exportShipment->supplier->name,
                 'address' => $exportShipment->address,
                 'export_code' => $exportShipment->export_code,
                 'receve_phone' => $exportShipment->receve_phone,
@@ -28,8 +29,10 @@ class ExportShipmentResource extends JsonResource
                 'quantity' => $exportShipment->quantity,
                 'export_date' => $exportShipment->export_date,
                 'status' => $exportShipment->status,
-                'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $exportShipment->created_at)->format('d/m/Y'),
-                'updated_at' => Carbon::createFromFormat('Y-m-d H:i:s', $exportShipment->updated_at)->format('d/m/Y')
+                'export_type' => $exportShipment->export_type,
+                'payment' => $exportShipment->payment,
+                'created_at' => $exportShipment->created_at ? Carbon::createFromFormat('Y-m-d H:i:s', $exportShipment->created_at)->format('d/m/Y') : '',
+                'updated_at' => $exportShipment->updated_at ? Carbon::createFromFormat('Y-m-d H:i:s', $exportShipment->updated_at)->format('d/m/Y') : ''
             ])
         ];
     }

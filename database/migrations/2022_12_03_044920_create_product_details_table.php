@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('import_shipment_detail', function (Blueprint $table) {
+        Schema::create('product_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('import_shipment_id');
-            $table->foreign('import_shipment_id')->references('id')->on('import_shipments');
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products');
+            $table->unsignedBigInteger('import_shipment_detail_id');
+            $table->foreign('import_shipment_detail_id')->references('id')->on('import_shipment_detail');
             $table->integer('quantity');
-            $table->float('import_price');
-            $table->integer('status')->default(1);
+            $table->string('lot_code')->nullable();
+            $table->double('import_price');
             $table->timestamps();
         });
     }
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('import_shipment_detail');
+        Schema::dropIfExists('product_details');
     }
 };

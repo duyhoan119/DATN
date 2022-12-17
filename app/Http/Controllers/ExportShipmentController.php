@@ -9,6 +9,8 @@ use App\Http\Resources\ExportShipmentResource;
 use App\Models\ExportShipment;
 use App\Models\ExportShipmentDetail;
 use App\Models\Product;
+use App\Models\productDetail;
+use App\Models\Supplier;
 use Carbon\Carbon;
 
 class ExportShipmentController extends Controller
@@ -17,18 +19,34 @@ class ExportShipmentController extends Controller
     {
         $importShipments = ExportShipment::query()
             ->with('user')
+            ->with('supplier')
             ->orderBy('created_at', 'DESC')->paginate(15);
         return new ExportShipmentResource($importShipments);
     }
 
     public function save(ExportShipmentRequest $request)
     {
-        $createExportShipmentData = $request->all();
-        $products = collect($createExportShipmentData['products']);
+        $ExportShipmentData = $request->all();
+        $createExportShipmentData = [];
+        if ($ExportShipmentData['export_type'] === 2) {
+            $insertSupplierData = [
+                'name' => $ExportShipmentData['user_name'],
+                'phone_number' => $ExportShipmentData['phone_number']
+            ];
+            $supplier = Supplier::query()->create($insertSupplierData);
+            $createExportShipmentData['supplier_id'] = $supplier->id;
+        } else {
+            $createExportShipmentData['supplier_id'] = $ExportShipmentData['supplier_id'];
+        }
+        $products = collect($ExportShipmentData['products']);
         $createExportShipmentData['export_code'] = $this->GetExportCode();
+        $createExportShipmentData['export_type'] = $ExportShipmentData['export_type'];
+        $createExportShipmentData['payment'] = $ExportShipmentData['payment'];
+        $createExportShipmentData['user_id'] = $ExportShipmentData['user_id'];
+        $createExportShipmentData['description'] = $ExportShipmentData['description'];
         $createExportShipmentData['quantity'] = array_sum($products->pluck('quantity')->toArray());
         $createExportShipmentData['totall_price'] = array_sum($this->GetTotallPrice($products));
-        $createExportShipmentData['export_date'] = Carbon::createFromFormat('d/m/Y', $createExportShipmentData['export_date'])->format('Y-m-d H:i:s');
+        $createExportShipmentData['export_date'] = Carbon::createFromFormat('d/m/Y', $ExportShipmentData['export_date'])->format('Y-m-d H:i:s');
         if ($exportShipment = ExportShipment::query()->create($createExportShipmentData)) {
 
             $exportShipmentDetailDatas = $this->getExportShipmentDetailData($exportShipment->id, $request->products);
@@ -37,13 +55,15 @@ class ExportShipmentController extends Controller
 
                 $exportShipmentDetail = ExportShipmentDetail::query()->create($exportShipmentDetailData);
 
-                $product = Product::find($exportShipmentDetail->product_id);
+                $productDetail = productDetail::query()->where('product_id',$exportShipmentDetail->product_id)->where('lot_code',$exportShipmentDetail->lot_code)->first();
+                $productDetail->quantity -= $exportShipmentDetail->quantity;
+                $productDetail->save();
 
+                $product = Product::find($exportShipmentDetail->product_id);
                 $product->quantity -= $exportShipmentDetail->quantity;
                 $product->save();
             }
         }
-
         return true;
     }
 
@@ -63,7 +83,7 @@ class ExportShipmentController extends Controller
         $latestExportShipment = ExportShipment::latest('id')->first(['id']);
         $latestId = $latestExportShipment->id ?? 0;
 
-        return 'MXH' . str_pad(++$latestId, 7, '0', STR_PAD_LEFT);
+        return 'PX' . str_pad(++$latestId, 9, '0', STR_PAD_LEFT);
     }
 
     protected function getExportShipmentDetailData($exportShipmentId, $products)
@@ -75,6 +95,7 @@ class ExportShipmentController extends Controller
             $item['product_id'] = $product['id'];
             $item['quantity'] = $product['quantity'];
             $item['price'] = $product['price'];
+            $item['lot_code'] = $product['lot_code'];
             $result[] = $item;
         }
 

@@ -14,7 +14,6 @@ class ImportShipmentDetail extends Model
         'product_id',
         'import_shipment_id',
         'quantity',
-        'barcode',
         'import_price',
         'status'
     ];
@@ -22,5 +21,10 @@ class ImportShipmentDetail extends Model
     public function product(){
 
         return $this->belongsTo(Product::class);
+    }
+
+    public function productDetails(){
+
+        return $this->hasMany(productDetail::class,'import_shipment_detail_id','id');
     }
 }

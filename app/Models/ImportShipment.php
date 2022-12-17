@@ -14,7 +14,10 @@ class ImportShipment extends Model
         'import_date',
         'quantity',
         'import_code',
+        'import_type',
+        'payment',
         'import_price_totail',
+        'description'
     ];
 
     public function supplier()
