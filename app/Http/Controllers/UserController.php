@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(Request $request)
-    { 
+    {
         $keyword = $request->get('keyword');
 
         if ($keyword) {
@@ -27,25 +27,25 @@ class UserController extends Controller
     }
 
     public function save(UserRequest $request)
-    { 
+    {
         $data  = array_merge($request->all(), [
             'created_at' => date('Y-m-d H:i:s'),
             'status' => 1,
-            'password' => Hash::make($request->password) 
-        ]); 
-        if (User::insertGetId($data)) { 
-            if ($request->file('image')) { 
+            'password' => Hash::make($request->password)
+        ]);
+        if (User::insertGetId($data)) {
+            if ($request->file('image')) {
                 $user['image'] = $this->uploadFile($request->file('image'));
-            } 
+            }
             return true;
         }
         return false;
     }
 
     public function uploadFile($file)
-    { 
+    {
             $filename =  time() . '_' . $file->getClientOriginalName();
-            return $file->storeAs('imagesUser', $filename,  'public'); 
+            return $file->storeAs('imagesUser', $filename,  'public');
     }
 
     public function getUser($id)
@@ -55,13 +55,13 @@ class UserController extends Controller
 
     public function store($id, UpdateUserRequest $request)
     {
-        if ($request->file('avatar')) { 
+        if ($request->file('avatar')) {
             $user['avatar'] = $this->uploadFile($request->file('avatar'));
-        }   
+        }
         return User::query()->find($id)->update($request->all());
     }
 
-    public function delete($id) { 
+    public function delete($id) {
         if (!empty($id)) {
             $User = User::where('id', '=', $id);
             $data = [
@@ -70,5 +70,5 @@ class UserController extends Controller
             $User->update($data);
             return true;
         }
-    } 
+    }
 }

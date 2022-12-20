@@ -32,9 +32,9 @@ class ProductController extends Controller
         $product->fill($request->all());
         $product->image = $request->image;
 
-        $KiTuDau = strtoupper(substr($product->Category->name, 0 ,2));
+        $KiTuDau = strtoupper(substr($product->Category->name, 0, 2));
         $KiTuRandom = Str::random(10);
-        $sku = "$KiTuDau  $KiTuRandom";
+        $sku = "$KiTuDau $KiTuRandom";
         $product->sku = $sku;
 
         if ($request->file('image')) {
@@ -46,8 +46,8 @@ class ProductController extends Controller
 
     public function uploadFile($file)
     {
-            $filename =  time() . '_' . $file->getClientOriginalName();
-            return $file->storeAs('imagesProduct', $filename,  'public');
+        $filename =  time() . '_' . $file->getClientOriginalName();
+        return $file->storeAs('imagesProduct', $filename,  'public');
     }
 
     public function getProduct($id)
@@ -65,11 +65,12 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $productDetail = productDetail::query()->where('product_id',$id)->get();
+        $productDetail = productDetail::query()->where('product_id', $id)->get();
         return new productDetailResource($productDetail);
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         if (!empty($id)) {
             $Product = Product::where('id', '=', $id);
             $data = [
@@ -80,4 +81,3 @@ class ProductController extends Controller
         }
     }
 }
-

@@ -30,7 +30,6 @@ class StatisticalController extends Controller
             ->orderBy('total_quantity', 'desc')
             ->limit(5)
             ->with('product')
-
             ->get();
 
         $mostProfitableProducts = ExportShipmentDetail::select(
