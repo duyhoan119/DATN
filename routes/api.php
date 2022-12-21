@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ImportShipmentController;
 use App\Http\Controllers\ProductController;
@@ -44,6 +45,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'save']);
 Route::get('products/{id}', [ProductController::class, 'show']);
 Route::put('products/{id}', [ProductController::class, 'store']);
+Route::get('product-detail/{id}', [ProductController::class, 'getProductDetail']);
 Route::delete('/products/{id}', [ProductController::class, 'delete']);
 
 // attributes
@@ -77,15 +79,13 @@ Route::prefix('export-shipment')->group(function () {
     Route::post('/', [ExportShipmentController::class, 'save']);
     Route::get('/{export_id}', [ExportShipmentController::class, 'getDetail']);
     Route::get('/', [ExportShipmentController::class, 'index']);
-
 });
 
 Route::get('/statistical', [StatisticalController::class, 'show']);
 
-Route::prefix('/order-refund')->group(function () {
+Route::prefix('/refund-order')->group(function () {
     Route::get('/', [OrderRefundController::class, 'index']);
     Route::post('/', [OrderRefundController::class, 'store']);
-    Route::get('/{order_refund_id}', [OrderRefundController::class, 'show']);
-    Route::get('/{order_refund_id}', [OrderRefundController::class, 'SearchExportShipment']);
+    Route::get('/{refund_export_id}', [OrderRefundController::class, 'show']);
 });
-
+Route::get('/export-shipment', [OrderRefundController::class, 'SearchExportShipment']);
