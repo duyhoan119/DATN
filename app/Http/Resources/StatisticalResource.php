@@ -15,11 +15,17 @@ class StatisticalResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'interest_in_month' => $this['interestInMonth'],
-            'funds' => $this['funds'],
-            'product_totail' => $this['productTotail'],
-            'best_selling_products' => $this['bestSellingProducts'],
-            'most_profitable_products' => $this['mostProfitableProducts'],
+            'sales_money_in_month' => $this['salesMoneyInMonth'], //tiền lãi trong tháng
+            'sales_money_in_yesterday' => $this['salesMoneyInYesterday'], //tiền lãi trong ngày hôm qua 
+            'sales_money_in_now' => $this['salesMoneyInNow'], //tiền lãi trong ngày 
+            'sales_money_in_day_of_week' => $this['salesMoneyInDayOfWeek'], //tiền lãi trong tuần
+
+            'funds' => $this['funds'], // quỹ vốn nhập hàng
+            'product_totail' => $this['productTotail'], // tổng sản phẩm
+            'best_selling_products' => $this['bestSellingProducts'], // sản phẩm bán chạy nhất
+            'most_profitable_products' => $this['mostProfitableProducts'], // sản phẩm có lợi nhuận cao nhất
+
+            
         ];
     }
 }

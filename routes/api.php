@@ -80,8 +80,14 @@ Route::prefix('export-shipment')->group(function () {
     Route::get('/{export_id}', [ExportShipmentController::class, 'getDetail']);
     Route::get('/', [ExportShipmentController::class, 'index']);
 });
+ 
+Route::prefix('/statistical')->group(function () {
+    Route::get('/', [StatisticalController::class, 'show']); 
+    Route::post('/supplier', [StatisticalController::class, 'supplier']); 
+    Route::post('/product', [StatisticalController::class, 'product']); 
+    Route::post('/inventoryProduct', [StatisticalController::class, 'inventoryProduct']); 
+});
 
-Route::get('/statistical', [StatisticalController::class, 'show']);
 
 Route::prefix('/refund-order')->group(function () {
     Route::get('/', [OrderRefundController::class, 'index']);
