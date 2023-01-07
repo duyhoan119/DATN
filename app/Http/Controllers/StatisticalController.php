@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\DB;
 
 class StatisticalController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
         $now = Carbon::now();
         $yesterday = Carbon::yesterday();
         $DayOfWeek = $now->weekOfMonth;
 
-        $salesMoneyInMonth = ExportShipment::query()->whereMonth('created_at', $now->month)->get();
+        $salesMoneyInMonth = ExportShipment::query()->whereMonth('created_at', $now->month)->orderBy('created_at')->get();
         $salesMoneyInYesterday = ExportShipment::query()->whereDay('created_at', $yesterday->day)->sum('totall_price');
         $salesMoneyInNow = ExportShipment::query()->whereDay('created_at', $now->day)->sum('totall_price');
         $salesMoneyInDayOfWeek = ExportShipment::query()->whereMonth('export_date', $DayOfWeek)->sum('totall_price');
@@ -50,8 +50,17 @@ class StatisticalController extends Controller
             ->get();
 
         $productTotail = Product::query()->sum('quantity');
+        $salesInMonth = '';
+        if (!empty($request->month)) {
+            $month = $request->month; 
+            $salesInMonth = ExportShipment::query()->whereMonth('created_at', $month)->orderBy('created_at')->groupBy('created_at')
+            ->get();
+        } 
+        
+
         $result = [
             'sales_money_in_month' => $salesMoneyInMonth,
+            'sales_in_month' => $salesInMonth,
             'sales_money_in_yesterday' => $salesMoneyInYesterday,
             'sales_money_in_now' => $salesMoneyInNow,
             'sales_money_in_day_ofWeek' => $salesMoneyInDayOfWeek,
@@ -60,6 +69,8 @@ class StatisticalController extends Controller
             'best_selling_products' => $bestSellingProducts,
             'most_profitable_products' => $mostProfitableProducts,
         ];
+
+        
         return json_encode($result);
     }
 
@@ -159,18 +170,46 @@ class StatisticalController extends Controller
             ->limit(5)
             ->with('product')
             ->get();
+
         if (!empty($request->all())) {
 
             $data = $request->all();
             $from_date = $data['from_date'];
             $to_date = $data['to_date'];
-            $product_id = $data['product_id'];
+
+            if(!empty($data['product_id']) ){
+                $product_id = $data['product_id'];
 
             $Product = Product::where('status', '=', 1)->find($product_id);
             $quantity_import = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $product_id)->orderBy('created_at', 'ASC')->sum('quantity');
             $quantity_export = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $product_id)->orderBy('created_at', 'ASC')->sum('quantity');
-
             $result = ['Product' => $Product, 'quantity_import' => $quantity_import, 'quantity_export' => $quantity_export];
+            }else{
+                $ProductExportQuantity_filer_Date = ExportShipmentDetail::query()->whereBetween('export_shipment_details.created_at', [$from_date, $to_date])->select(
+                    'product_id',
+                    DB::raw('SUM(export_shipment_details.quantity) as quantity')
+                )
+                    ->leftJoin('products', 'products.id', '=', 'export_shipment_details.product_id')
+                    ->groupBy('product_id')
+                    ->limit(5)
+                    ->with('product')
+                    ->get();
+                $import_quantity_totail_filer_Date = ImportShipmentDetail::query()->whereBetween('import_shipment_detail.created_at', [$from_date, $to_date])->select(
+                    'product_id',
+                    DB::raw(' SUM(import_shipment_detail.quantity) as quantity')
+                )
+                    ->leftJoin('products', 'products.id', '=', 'import_shipment_detail.product_id')
+                    ->groupBy('product_id')
+                    ->limit(5)
+                    ->with('product')
+                    ->get();
+            $result = ['quantity_import' => $ProductExportQuantity_filer_Date, 'quantity_export' => $import_quantity_totail_filer_Date];
+            }
+            // tồn đầu kỳ = tồn thời gian hiện tại + số lượng xuất trong thời gian filer đầu tới hiện tại - số lượng nhập từ ngày hiện tại trở về ngày filer đầu
+            // tồn cuối kỳ = tồn đầu kỳ + số lượng nhập trong kỳ - đi số lượng xuất trong kỳ
+            // 1000 = 2000 + 1000 - 1500 
+
+            
             return json_encode($result);
         }
         $result = ['product_export_quantity' => $ProductExportQuantity, 'import_quantity_totail' => $import_quantity_totail];
