@@ -36,7 +36,7 @@ class OrderRefundController extends Controller
     public function store(CreateRefundExportShipmentRequest $request)
     {
         $refundExportShipmentData = $request->all();
-        $createrefundExportShipmentData = [];
+        $createrefundExportShipmentData = []; 
         $products = collect($refundExportShipmentData['products']);
         $createrefundExportShipmentData['refund_code'] = $this->GetRefundExportCode();
         $createrefundExportShipmentData['export_shipment_id'] = $refundExportShipmentData['export_shipment_id'];

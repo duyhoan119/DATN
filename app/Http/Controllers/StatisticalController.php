@@ -9,6 +9,7 @@ use App\Models\ImportShipmentDetail;
 use App\Models\Product;
 use App\Models\ProductDetail;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -74,6 +75,7 @@ class StatisticalController extends Controller
             ->limit(5)
             ->with('supplier')
             ->get();
+            
         $import_price_totail = ImportShipment::select(
             'supplier_id',
             DB::raw('SUM(import_shipments.import_price_totail) as import_price_totail,SUM(import_shipments.quantity) as quantity')
@@ -118,21 +120,28 @@ class StatisticalController extends Controller
         if (!empty($request->all())) {
 
             $data = $request->all();
-            $from_date = $data['from_date'];
-            $lot_code = $data['lot_code'];
-            $to_date = $data['to_date'];
-            $product_id = $data['product_id'];
+            $fromDate = isset($data['from_date']) ? $data['from_date'] : '';
+            $toDate = isset($data['to_date']) ? $data['to_date'] : '';
+            $productId = isset($data['product_id']) ? $data['product_id'] : '';
+            $lotCode = isset($data['lot_code']) ? $data['lot_code'] : '';
 
-            $ProductDetail = ProductDetail::where('product_id', '=', $product_id)->where('lot_code', '=', $lot_code)->get();
-            $ProductFiler = ExportShipmentDetail::whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $product_id)->where('lot_code', '=', $lot_code)->orderBy('created_at', 'ASC')->get();
-            $totalProduct = ExportShipmentDetail::whereBetween('created_at', [$from_date, $to_date])->where('lot_code', '=', $lot_code)->where('product_id', '=', $product_id)->sum('quantity');
+            $productDetail = ProductDetail::query()->where('product_id', $productId)->where('lot_code', 'LIKE', $lotCode)->pluck('import_price')->toArray();
 
-            foreach ($ProductFiler as $key => $iteam) {
-                $interest = $iteam->price * $iteam->quantity;
-                $interest += $interest;
+            $productFilter = ExportShipmentDetail::query()->when($fromDate && $toDate, function (Builder $query, string $from_date, string $to_date) {
+                $query->whereBetween('created_at', [$from_date, $to_date]);
+            })->where('product_id', $productId)->where('lot_code', 'LIKE', $lotCode)->orderBy('created_at', 'ASC')->get();
+
+            $totalProduct = ExportShipmentDetail::query()->when($fromDate && $toDate, function (Builder $query, string $from_date, string $to_date) {
+                $query->whereBetween('created_at', [$from_date, $to_date]);
+            })->where('lot_code', 'LIKE', $lotCode)->where('product_id', $productId)->sum('quantity');
+
+            $interest = 0;
+            foreach ($productFilter as $key => $iteam) {
+                $interest += $iteam->price * $iteam->quantity;
             }
-            $profit = $interest - $ProductDetail[0]['import_price'] * $totalProduct;
-            $result = ['profit' => $profit, 'totalProduct' => $totalProduct, 'import_price' => $ProductDetail[0]['import_price'], 'product_filer' => $ProductFiler];
+
+            $profit = $interest - $productDetail[0] * $totalProduct;
+            $result = ['profit' => $profit, 'totalProduct' => $totalProduct, 'import_price' => $productDetail[0], 'product_filer' => $productFilter];
             return json_encode($result);
         }
         $result = $ProductExportAll;
@@ -160,11 +169,10 @@ class StatisticalController extends Controller
             ->with('product')
             ->get();
         if (!empty($request->all())) {
-
             $data = $request->all();
-            $from_date = $data['from_date'];
-            $to_date = $data['to_date'];
-            $product_id = $data['product_id'];
+            $from_date = isset($data['from_date']) ? $data['from_date'] : '';
+            $to_date = isset($data['to_date']) ? $data['to_date'] : '';
+            $product_id = isset($data['product_id']) ? $data['product_id'] : '';
 
             $Product = Product::where('status', '=', 1)->find($product_id);
             $quantity_import = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $product_id)->orderBy('created_at', 'ASC')->sum('quantity');
@@ -188,7 +196,7 @@ class StatisticalController extends Controller
             ->limit(5)
             ->with('supplier')
             ->get();
-            
+
         $supplier_quantity_import = ImportShipment::select(
             'supplier_id',
             DB::raw('SUM(import_shipments.quantity) as quantity')
@@ -208,18 +216,20 @@ class StatisticalController extends Controller
             $supplier_quantity_export = ExportShipment::whereBetween('export_date', [$from_date, $to_date])->where('supplier_id', '=', $supplier_id)->orderBy('export_date', 'ASC')->get();
             $supplier_quantity_import = ImportShipment::whereBetween('import_date', [$from_date, $to_date])->where('supplier_id', '=', $supplier_id)->orderBy('import_date', 'ASC')->get();
 
-            $result = [ 
-                'supplier_export' => [ 'supplier_quantity_export' => $supplier_quantity_export->sum('quantity'),
-                'supplier_export' => $supplier_quantity_export
-            ],
-                'supplier_import' => [ 'supplier_quantity_import' => $supplier_quantity_import->sum('quantity'),
-                'supplier_import' => $supplier_quantity_import
-            ],
+            $result = [
+                'supplier_export' => [
+                    'supplier_quantity_export' => $supplier_quantity_export->sum('quantity'),
+                    'supplier_export' => $supplier_quantity_export
+                ],
+                'supplier_import' => [
+                    'supplier_quantity_import' => $supplier_quantity_import->sum('quantity'),
+                    'supplier_import' => $supplier_quantity_import
+                ],
             ];
             return json_encode($result);
         }
 
-        $result = [ 
+        $result = [
             'supplier_quantity_export' => $supplier_quantity_export,
             'supplier_quantity_import' => $supplier_quantity_import,
         ];

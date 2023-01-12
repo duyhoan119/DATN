@@ -50,6 +50,7 @@ Route::delete('/products/{id}', [ProductController::class, 'delete']);
 
 // attributes
 
+
 Route::get('attributes', [AttributeController::class, 'index']);
 Route::post('attributes', [AttributeController::class, 'save']);
 Route::get('attributes/{id}', [AttributeController::class, 'getAttribute']);
@@ -80,13 +81,13 @@ Route::prefix('export-shipment')->group(function () {
     Route::get('/{export_id}', [ExportShipmentController::class, 'getDetail']);
     Route::get('/', [ExportShipmentController::class, 'index']);
 });
- 
+
 Route::prefix('/statistical')->group(function () {
-    Route::get('/', [StatisticalController::class, 'show']); 
-    Route::post('/supplier', [StatisticalController::class, 'supplier']); 
-    Route::post('/product', [StatisticalController::class, 'product']); 
-    Route::post('/inventoryProduct', [StatisticalController::class, 'inventoryProduct']); 
-    Route::post('/inventorySupplier', [StatisticalController::class, 'inventorySupplier']); 
+    Route::get('/', [StatisticalController::class, 'show']);
+    Route::post('/supplier', [StatisticalController::class, 'supplier']);
+    Route::post('/product', [StatisticalController::class, 'product']);
+    Route::post('/inventoryProduct', [StatisticalController::class, 'inventoryProduct']);
+    Route::post('/inventorySupplier', [StatisticalController::class, 'inventorySupplier']);
 });
 
 
