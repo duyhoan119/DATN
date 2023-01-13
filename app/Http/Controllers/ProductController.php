@@ -4,26 +4,24 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\SearchProductRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\productDetailResource;
 use App\Http\Resources\UpdateProductResource;
 use App\Models\productDetail;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(SearchProductRequest $request)
     {
-        $keyword = $request->get('keyword');
+        $product =  Product::query()->when($request->keyword, function (Builder $query, string $keyword) {
+            $query->where('name', 'like', '%' . $keyword . '%')->orWhere('sku', 'like', '%' . $keyword . '%');
+        })->get();
 
-        if ($keyword) {
-            return Response()->json(Product::where('status', '=', 1)->where('name', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        } else if ($keyword) {
-            return Response()->json(Product::where('status', '=', 1)->where('sku', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        } else {
-            return Response()->json(Product::where('status', '=', 1)->paginate(10), 200);
-        }
+        return $product;
     }
 
     public function save(ProductRequest $request)

@@ -12,12 +12,16 @@ use App\Models\Product;
 use App\Models\productDetail;
 use App\Models\Supplier;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class ImportShipmentController extends Controller
 {
     public function index(SearchImportShipment $request)
     {
         $importShipments = ImportShipment::query()
+            ->when($request->keyword, function (Builder $query, string $keyword) {
+                $query->where('import_code', 'like', '%' . $keyword . '%');
+            })
             ->with('supplier')
             ->orderBy('created_at', 'DESC')->paginate(15);
         return new ImportShipmentResource($importShipments);

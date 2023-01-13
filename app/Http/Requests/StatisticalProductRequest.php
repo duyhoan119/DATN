@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class LoginRequest extends FormRequest
+class StatisticalProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,20 +28,40 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|min:6|max:32',
-            'password' => 'required|min:3'
+            'from_date' => [
+                'nullable',
+                'string',
+                'before:today'
+            ],
+            'to_date' => [
+                'nullable',
+                'string',
+                'before:today'
+            ],
+            'product_id' => [
+                'required',
+                'integer'
+            ],
+            'lot_code' => [
+                'required',
+                'string'
+            ]
         ];
     }
 
     public function messages()
     {
         return [
-            'email.required' => 'Email bắt buộc nhập',
-            'email.email' => 'Email phải đúng định dạng',
-            'email.min' => 'Email tối thiểu 6 ký tự',
-            'email.max' => 'Email tối đa 32 ký tự',
-            'password.required' => 'Mật khẩu bắt buộc nhập',
-            'password.min' => 'Mật khẩu tối thiểu 3 ký tự'
+            'product_id.required' => 'Id Sản phẩm không đươc bỏ trống ',
+            'product_id.integer' => 'Id Sản phẩm phải là số',
+
+            'lot_code.required' => 'Mã lô không đươc bỏ trống ',
+            'lot_code.string' => 'Mã lô phải là số',
+
+            'to_date.befor' => 'Ngày không được chọn ở tương lai',
+
+            'from_date.before' => 'Ngày không được chọn ở tương lai',
+
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StatisticalProductRequest;
 use App\Models\ExportShipment;
 use App\Models\ExportShipmentDetail;
 use App\Models\ImportShipment;
@@ -75,7 +76,7 @@ class StatisticalController extends Controller
             ->limit(5)
             ->with('supplier')
             ->get();
-            
+
         $import_price_totail = ImportShipment::select(
             'supplier_id',
             DB::raw('SUM(import_shipments.import_price_totail) as import_price_totail,SUM(import_shipments.quantity) as quantity')
@@ -104,7 +105,7 @@ class StatisticalController extends Controller
         return json_encode($result);
     }
 
-    public function product(Request $request)
+    public function product(StatisticalProductRequest $request)
     {
         $ProductExportAll = ExportShipmentDetail::select('lot_code')->select(
             'product_id',
@@ -117,8 +118,7 @@ class StatisticalController extends Controller
             ->with('product')
             ->get();
 
-        if (!empty($request->all())) {
-
+        if (!empty($request)) {
             $data = $request->all();
             $fromDate = isset($data['from_date']) ? $data['from_date'] : '';
             $toDate = isset($data['to_date']) ? $data['to_date'] : '';

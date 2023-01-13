@@ -20,10 +20,10 @@ class OrderRefundController extends Controller
     public function index(SearchRefundExportShipmentRequest $request)
     {
         $refundExportShipment = RefundExportShipment::query()
-            ->when($request['refund_code'], function (Builder $query, $refundCode) {
+            ->when($request['refund_code'], function (Builder $query, string $refundCode) {
                 $query->where('refund_code', 'like', '%' . $refundCode . '%');
             })
-            ->with('user', 'supplier')->get();
+            ->with('user', 'supplier', 'refundExportShipmentDetail', 'refundExportShipmentDetail.product', 'refundExportShipmentDetail.product.productDetails')->get();
         return new GetRefundExportShipmentResource($refundExportShipment);
     }
 
@@ -36,7 +36,7 @@ class OrderRefundController extends Controller
     public function store(CreateRefundExportShipmentRequest $request)
     {
         $refundExportShipmentData = $request->all();
-        $createrefundExportShipmentData = []; 
+        $createrefundExportShipmentData = [];
         $products = collect($refundExportShipmentData['products']);
         $createrefundExportShipmentData['refund_code'] = $this->GetRefundExportCode();
         $createrefundExportShipmentData['export_shipment_id'] = $refundExportShipmentData['export_shipment_id'];

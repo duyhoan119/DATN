@@ -28,10 +28,22 @@ class SearchImportShipment extends FormRequest
     public function rules()
     {
         return [
-
+            'keyword' => [
+                'nullable',
+                'string',
+                'max:20'
+            ]
         ];
     }
-    
+
+    public function messages()
+    {
+        return [
+            'keyword.string'=>'Từ khóa phải là 1 chuỗi kí tự',
+            'keyword.max'=>'Từ khóa phải ít hơn 20 kí tự'
+        ];
+    }
+
     protected function failedValidation(Validator $validator)
     {
         $errors = (new ValidationException($validator))->errors();
