@@ -80,4 +80,10 @@ class ProductController extends Controller
             return true;
         }
     }
+
+    public function getProductDetail($id)
+    {
+        $productDetail = productDetail::query()->find($id);
+        return $productDetail;
+    }
 }
