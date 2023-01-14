@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class LoginRequest extends FormRequest
+class SearchProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,20 +28,19 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|min:6|max:32',
-            'password' => 'required|min:3'
+          'keyword'=>[
+            'nullable',
+            'string',
+            'max:15'
+          ]
         ];
     }
 
     public function messages()
     {
         return [
-            'email.required' => 'Email bắt buộc nhập',
-            'email.email' => 'Email phải đúng định dạng',
-            'email.min' => 'Email tối thiểu 6 ký tự',
-            'email.max' => 'Email tối đa 32 ký tự',
-            'password.required' => 'Mật khẩu bắt buộc nhập',
-            'password.min' => 'Mật khẩu tối thiểu 3 ký tự'
+           'keyword.string'=>'Từ khóa phải là chữa ',
+           'keyword.max'=>'Từ khóa phải dưới 15 kí tự'
         ];
     }
 

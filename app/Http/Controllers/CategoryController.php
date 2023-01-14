@@ -8,6 +8,8 @@ use App\Http\Resources\CategoriesResource;
 use App\Http\Resources\UpdateCategoryResource;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 
@@ -50,8 +52,11 @@ class CategoryController extends Controller
         return false;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return new CategoriesResource(Category::all());
+        $category = Category::query()->when($request->keyword,function(Builder $query, string $keyword){
+            $query->where('name',$keyword);
+        })->get();
+        return new CategoriesResource($category);
     }
 }
