@@ -82,7 +82,7 @@ Route::prefix('export-shipment')->group(function () {
 });
  
 Route::prefix('/statistical')->group(function () {
-    Route::get('/', [StatisticalController::class, 'show']); 
+    Route::post('/', [StatisticalController::class, 'show']); 
     Route::post('/supplier', [StatisticalController::class, 'supplier']); 
     Route::post('/product', [StatisticalController::class, 'product']); 
     Route::post('/inventoryProduct', [StatisticalController::class, 'inventoryProduct']); 
