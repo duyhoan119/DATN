@@ -9,6 +9,7 @@ use App\Models\ImportShipmentDetail;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\ProductDetail;
+use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -196,7 +197,7 @@ class StatisticalController extends Controller
 
             // tồn đầu kỳ = tồn thời gian hiện tại + số lượng xuất trong thời gian filer đầu tới hiện tại - số lượng nhập từ ngày hiện tại trở về ngày filer đầu
             // tồn cuối kỳ = tồn đầu kỳ + số lượng nhập trong kỳ - đi số lượng xuất trong kỳ
-
+            // danh mục -> lấy từ product(id) -> 
         }
         return json_encode($result);
     }
@@ -204,14 +205,14 @@ class StatisticalController extends Controller
     public function inventorySupplier(Request $request)
     {
         $data = $request->all();
-        $now = Carbon::now(); 
+        $now = Carbon::now();
         if (empty($request->from_date && $request->to_date)) {
             $from_date = Carbon::now()->month(-3);
             $to_date = $now;
         } else {
             $from_date = $data['from_date'];
             $to_date = $data['to_date'];
-        } 
+        }
 
         if (empty($request->supplier_id)) {
 
@@ -233,7 +234,7 @@ class StatisticalController extends Controller
                 $result[] = ['supplier' => $iteam, 'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
             }
         } else {
-            $supplier_id = $data['supplier_id']; 
+            $supplier_id = $data['supplier_id'];
             $supplier = Product::where('status', '=', 1)->find($supplier_id);
 
             $superlier_quantity_export_all = ExportShipment::where('supplier_id', '=', $supplier_id)->orderBy('export_date', 'ASC')->sum('quantity');
@@ -249,6 +250,58 @@ class StatisticalController extends Controller
 
             $result[] = ['supplier' => $supplier, 'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
         }
+        return json_encode($result);
+    }
+
+    public function inventoryCategory(Request $request)
+    {
+
+        $data = $request->all();
+        $now = Carbon::now();
+
+
+        if (empty($request->from_date && $request->to_date)) {
+            $from_date = Carbon::now()->month(-12);
+            $to_date = $now;
+        } else {
+            $from_date = $data['from_date'];
+            $to_date = $data['to_date'];
+        }
+
+
+        $categorys = Category::where('status', '=', 1)->get();
+
+        foreach ($categorys as $key => $iteam) {
+            $category = Category::where('status', '=', 1)->find($iteam->id);
+            $category_quantity = Product::where('status', '=', 1)->where('category_id', '=', $iteam->id)->get();
+
+            foreach ($category_quantity as $iteam) {
+                $product = Product::where('category_id', '=', $iteam->category_id)->find($iteam->id);
+                $quantity_import = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->sum('quantity');
+                $quantity_import_to_date = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
+
+                $quantity_export = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->orderBy('created_at', 'ASC')->sum('quantity');
+                $quantity_export_to_date = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
+
+                $beginning_inventory = $product->quantity + $quantity_export_to_date - $quantity_import_to_date;
+                $ending_inventory = $beginning_inventory + $quantity_import - $quantity_export;
+                $result2[] = ['beginning_inventory' => $beginning_inventory, 'quantity_import' => $quantity_import, 'ending_inventory' => $ending_inventory,  'quantity_export' => $quantity_export];
+            }
+            if (!empty($result2)) { 
+                $export_import = array_shift($result2); 
+                foreach ($result2 as $value){
+                    $export_import = array_merge($export_import, $value);  
+                } 
+                foreach ($export_import as $key => &$value){
+                    $value = array_sum(array_column($result2, $key)); 
+                    
+                } 
+                unset($value);
+            };
+
+
+            $result[] = ['category' => $category, 'category_quantity' => $category_quantity->sum('quantity'), 'export_import' => $export_import];
+        }  
         return json_encode($result);
     }
 }

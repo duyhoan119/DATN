@@ -87,6 +87,7 @@ Route::prefix('/statistical')->group(function () {
     Route::post('/product', [StatisticalController::class, 'product']); 
     Route::post('/inventoryProduct', [StatisticalController::class, 'inventoryProduct']); 
     Route::post('/inventorySupplier', [StatisticalController::class, 'inventorySupplier']); 
+    Route::post('/inventoryCategory', [StatisticalController::class, 'inventoryCategory']); 
 });
 
 
