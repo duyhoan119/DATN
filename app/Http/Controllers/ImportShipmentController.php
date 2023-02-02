@@ -9,15 +9,19 @@ use App\Http\Resources\ImportShipmentResource;
 use App\Models\ImportShipment;
 use App\Models\ImportShipmentDetail;
 use App\Models\Product;
-use App\Models\productDetail;
+use App\Models\ProductDetail;
 use App\Models\Supplier;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class ImportShipmentController extends Controller
 {
     public function index(SearchImportShipment $request)
     {
         $importShipments = ImportShipment::query()
+            ->when($request->keyword, function (Builder $query, string $keyword) {
+                $query->where('import_code', 'like', '%' . $keyword . '%');
+            })
             ->with('supplier')
             ->orderBy('created_at', 'DESC')->paginate(15);
         return new ImportShipmentResource($importShipments);
@@ -40,6 +44,7 @@ class ImportShipmentController extends Controller
         $products = collect($ImportShipmentData['products']);
         $createImportShipmentData['import_date'] = Carbon::createFromFormat('d/m/Y', $ImportShipmentData['import_date'])->format('Y-m-d H:i:s');
         $createImportShipmentData['import_type'] = $ImportShipmentData['import_type'];
+        $createImportShipmentData['user_id'] = $ImportShipmentData['user_id'];
         $createImportShipmentData['payment'] = $ImportShipmentData['payment'];
         $createImportShipmentData['description'] = $ImportShipmentData['description'];
         $createImportShipmentData['import_code'] = $this->GetImportCode();
@@ -48,12 +53,10 @@ class ImportShipmentController extends Controller
         if ($importShipment = ImportShipment::query()->create($createImportShipmentData)) {
 
             $importShipmentDetailDatas = $this->getImportShipmentDetailData($importShipment->id, $request->products);
-
             foreach ($importShipmentDetailDatas as $importShipmentDetailData) {
 
                 $importShipmentDetail = ImportShipmentDetail::query()->create($importShipmentDetailData);
                 $product = Product::find($importShipmentDetail->product_id);
-
                 $createProductDetailData = [
                     'product_id' => $product->id,
                     'import_shipment_detail_id' => $importShipmentDetail->id,
@@ -61,7 +64,7 @@ class ImportShipmentController extends Controller
                     'import_price' => $importShipmentDetail->import_price,
                     'lot_code' => $importShipmentDetail->lot_code,
                 ];
-                productDetail::query()->create($createProductDetailData);
+                ProductDetail::query()->create($createProductDetailData);
 
                 $product->quantity += $importShipmentDetail->quantity;
                 $product->save();

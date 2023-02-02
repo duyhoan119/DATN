@@ -9,15 +9,19 @@ use App\Http\Resources\ExportShipmentResource;
 use App\Models\ExportShipment;
 use App\Models\ExportShipmentDetail;
 use App\Models\Product;
-use App\Models\productDetail;
+use App\Models\ProductDetail;
 use App\Models\Supplier;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class ExportShipmentController extends Controller
 {
     public function index(SearchExportShipment $request)
     {
         $importShipments = ExportShipment::query()
+            ->when($request->keyword, function (Builder $query, string $keyword) {
+                $query->where('export_code', 'like', '%' . $keyword . '%');
+            })
             ->with('user')
             ->with('supplier')
             ->orderBy('created_at', 'DESC')->paginate(15);
@@ -55,7 +59,7 @@ class ExportShipmentController extends Controller
 
                 $exportShipmentDetail = ExportShipmentDetail::query()->create($exportShipmentDetailData);
 
-                $productDetail = productDetail::query()->where('product_id',$exportShipmentDetail->product_id)->where('lot_code',$exportShipmentDetail->lot_code)->first();
+                $productDetail = ProductDetail::query()->where('product_id', $exportShipmentDetail->product_id)->where('lot_code', $exportShipmentDetail->lot_code)->first();
                 $productDetail->quantity -= $exportShipmentDetail->quantity;
                 $productDetail->save();
 

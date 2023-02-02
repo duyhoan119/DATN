@@ -4,26 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\SearchProductRequest;
 use App\Models\Product;
-use Illuminate\Http\Request;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\productDetailResource;
 use App\Http\Resources\UpdateProductResource;
-use App\Models\productDetail;
+use App\Models\ExportShipmentDetail;
+use App\Models\ImportShipmentDetail;
+use App\Models\ProductDetail;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(SearchProductRequest $request)
     {
-        $keyword = $request->get('keyword');
+        $product =  Product::query()->when($request->keyword, function (Builder $query, string $keyword) {
+            $query->where('name', 'like', '%' . $keyword . '%')->orWhere('sku', 'like', '%' . $keyword . '%');
+        })->get();
 
-        if ($keyword) {
-            return Response()->json(Product::where('status', '=', 1)->where('name', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        } else if ($keyword) {
-            return Response()->json(Product::where('status', '=', 1)->where('sku', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        } else {
-            return Response()->json(Product::where('status', '=', 1)->paginate(10), 200);
-        }
+        return $product;
     }
 
     public function save(ProductRequest $request)
@@ -65,7 +66,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $productDetail = productDetail::query()->where('product_id', $id)->get();
+        $productDetail = ProductDetail::query()->where('product_id', $id)->get();
         return new productDetailResource($productDetail);
     }
 
@@ -83,7 +84,38 @@ class ProductController extends Controller
 
     public function getProductDetail($id)
     {
-        $productDetail = productDetail::query()->find($id);
+        $productDetail = ProductDetail::query()->find($id);
         return $productDetail;
+    }
+
+    public function getProductHistory($id)
+    {
+        $importHistory = ImportShipmentDetail::query()->where('product_id', $id)->orderBy('created_at', 'desc')->get();
+
+        $exportHistory = ExportShipmentDetail::query()->where('product_id', $id)->orderBy('created_at', 'desc')->get();
+
+        $result['import_history'] = $importHistory;
+        $result['export_history'] = $exportHistory;
+
+        return $result;
+    }
+
+    public function getCountExportShipment(Request $request)
+    {
+        $fromDate = isset($request['from_date']) ? $request['from_date'] : '';
+        $toDate = isset($request['to_date']) ? $request['to_date'] : '';
+        $result = ExportShipmentDetail::select(
+            'product_id',
+            DB::raw('COUNT(export_shipment_details.id) as totail_export')
+        )
+            ->leftJoin('products', 'products.id', '=', 'export_shipment_details.product_id')
+            ->groupBy('product_id')
+            ->orderBy('totail_export', 'desc')
+            ->when($fromDate && $toDate, function (Builder $query) use ($fromDate, $toDate) {
+                $query->whereBetween('export_shipment_details.created_at', [$fromDate, $toDate]);
+            })
+            ->with('product')
+            ->get();
+        return $result;
     }
 }

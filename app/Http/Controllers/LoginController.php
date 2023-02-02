@@ -1,34 +1,35 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
-    public function index(){
-        if(Auth::check()){
+    public function index()
+    {
+        if (Auth::check()) {
             return true;
-        }else {
+        } else {
             return back();
         }
     }
 
-    public function Login(Request $request)
+    public function Login(LoginRequest $request)
     {
-        $login =  $request->post();
-        $email =  $login['email'];
-        $password  = $login['password'];
-
-        if (Auth::attempt(['email' => $email, 'password' => $password])) {
-            Session::flash('successLoign'  , '{ "correct" : "đăng nhập thành công!" }');
+        if (Auth::attempt($request->only(['email','password']))) {
+            $user = Auth::user();
+            $tokenResult = $user->createToken('authToken')->plainTextToken;
+            Session::flash('successLoign', '{ "correct" : "đăng nhập thành công!" }');
             return Response()->json([
-                        json_decode(Session::get('successLoign')),
-                        Auth::user()
-                    ]);
+               "token"=> $tokenResult,
+                json_decode(Session::get('successLoign')),
+                Auth::user()
+            ]);
         } else {
-            Session::flash('failureLoign'  , '{ "error" : "tài khoản hoặc mật khẩu sai!" }');
+            Session::flash('failureLoign', '{ "error" : "tài khoản hoặc mật khẩu sai!" }');
             return json_decode(Session::get('failureLoign'));
         }
     }
@@ -38,5 +39,4 @@ class LoginController extends Controller
         Auth::logout();
         return back();
     }
-
 }
