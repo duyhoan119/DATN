@@ -197,7 +197,7 @@ class StatisticalController extends Controller
 
             // tồn đầu kỳ = tồn thời gian hiện tại + số lượng xuất trong thời gian filer đầu tới hiện tại - số lượng nhập từ ngày hiện tại trở về ngày filer đầu
             // tồn cuối kỳ = tồn đầu kỳ + số lượng nhập trong kỳ - đi số lượng xuất trong kỳ
-            // danh mục -> lấy từ product(id) -> 
+            // danh mục -> lấy từ product(id) ->
         }
         return json_encode($result);
     }
@@ -267,13 +267,42 @@ class StatisticalController extends Controller
             $from_date = $data['from_date'];
             $to_date = $data['to_date'];
         }
+        if (empty($request->id)) {
+            $categorys = Category::where('status', '=', 1)->get();
+            foreach ($categorys as $key => $iteam) {
+                $category = Category::where('status', '=', 1)->find($iteam->id);
+                $category_quantity = Product::where('status', '=', 1)->where('category_id', '=', $iteam->id)->get();
+
+                foreach ($category_quantity as $iteam) {
+                    $product = Product::where('category_id', '=', $iteam->category_id)->find($iteam->id);
+                    $quantity_import = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->sum('quantity');
+                    $quantity_import_to_date = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
+
+                    $quantity_export = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->orderBy('created_at', 'ASC')->sum('quantity');
+                    $quantity_export_to_date = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
+
+                    $beginning_inventory = $product->quantity + $quantity_export_to_date - $quantity_import_to_date;
+                    $ending_inventory = $beginning_inventory + $quantity_import - $quantity_export;
+                    $result2[] = ['beginning_inventory' => $beginning_inventory, 'quantity_import' => $quantity_import, 'ending_inventory' => $ending_inventory,  'quantity_export' => $quantity_export];
+                }
+                if (!empty($result2)) {
+                    $export_import = array_shift($result2);
+                    foreach ($result2 as $value) {
+                        $export_import = array_merge($export_import, $value);
+                    }
+                    foreach ($export_import as $key => &$value) {
+                        $value = array_sum(array_column($result2, $key));
+                    }
+                    unset($value);
+                };
 
 
-        $categorys = Category::where('status', '=', 1)->get();
-
-        foreach ($categorys as $key => $iteam) {
-            $category = Category::where('status', '=', 1)->find($iteam->id);
-            $category_quantity = Product::where('status', '=', 1)->where('category_id', '=', $iteam->id)->get();
+                $result[] = ['category' => $category, 'category_quantity' => $category_quantity->sum('quantity'), 'export_import' => $export_import];
+            }
+        } else {
+            $id = $data['id'];
+            $category = Category::where('status', '=', 1)->find($id);
+            $category_quantity = Product::where('status', '=', 1)->where('category_id', '=', $id)->get();
 
             foreach ($category_quantity as $iteam) {
                 $product = Product::where('category_id', '=', $iteam->category_id)->find($iteam->id);
@@ -287,21 +316,19 @@ class StatisticalController extends Controller
                 $ending_inventory = $beginning_inventory + $quantity_import - $quantity_export;
                 $result2[] = ['beginning_inventory' => $beginning_inventory, 'quantity_import' => $quantity_import, 'ending_inventory' => $ending_inventory,  'quantity_export' => $quantity_export];
             }
-            if (!empty($result2)) { 
-                $export_import = array_shift($result2); 
-                foreach ($result2 as $value){
-                    $export_import = array_merge($export_import, $value);  
-                } 
-                foreach ($export_import as $key => &$value){
-                    $value = array_sum(array_column($result2, $key)); 
-                    
-                } 
+            if (!empty($result2)) {
+                $export_import = array_shift($result2);
+                foreach ($result2 as $value) {
+                    $export_import = array_merge($export_import, $value);
+                }
+                foreach ($export_import as $key => &$value) {
+                    $value = array_sum(array_column($result2, $key));
+                }
                 unset($value);
             };
-
-
             $result[] = ['category' => $category, 'category_quantity' => $category_quantity->sum('quantity'), 'export_import' => $export_import];
-        }  
+        }
+
         return json_encode($result);
     }
 }
