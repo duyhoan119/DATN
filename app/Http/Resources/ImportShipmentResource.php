@@ -20,6 +20,7 @@ class ImportShipmentResource extends JsonResource
             'data' => $this->resource->map(fn (ImportShipment $importShipment) => [
                 'id' => $importShipment->id,
                 'import_date' => $importShipment->import_date,
+                'description' => $importShipment->description,
                 'supplier_id' => $importShipment->supplier_id,
                 'supplier_name' => $importShipment->supplier->name,
                 'quantity' => $importShipment->quantity,

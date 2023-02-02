@@ -19,6 +19,7 @@ class ExportShipmentResource extends JsonResource
         return [
             'data' => $this->resource->map(fn (ExportShipment $exportShipment) => [
                 'id' => $exportShipment->id,
+                'description' => $exportShipment->description,
                 'user_id' => $exportShipment->user_id,
                 'user_name' => $exportShipment->user->name,
                 'seller_name' => $exportShipment->supplier->name,

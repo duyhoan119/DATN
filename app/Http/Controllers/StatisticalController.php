@@ -68,7 +68,7 @@ class StatisticalController extends Controller
             'funds' => $funds,
             'product_totail' => $productTotail,
             'best_selling_products' => $bestSellingProducts,
-'most_profitable_products' => $mostProfitableProducts,
+            'most_profitable_products' => $mostProfitableProducts,
         ];
 
 
@@ -137,7 +137,7 @@ class StatisticalController extends Controller
 
             $ProductDetail = ProductDetail::where('product_id', '=', $product_id)->where('lot_code', '=', $lot_code)->get();
             $ProductFiler = ExportShipmentDetail::whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $product_id)->where('lot_code', '=', $lot_code)->orderBy('created_at', 'ASC')->get();
-$totalProduct = ExportShipmentDetail::whereBetween('created_at', [$from_date, $to_date])->where('lot_code', '=', $lot_code)->where('product_id', '=', $product_id)->sum('quantity');
+            $totalProduct = ExportShipmentDetail::whereBetween('created_at', [$from_date, $to_date])->where('lot_code', '=', $lot_code)->where('product_id', '=', $product_id)->sum('quantity');
 
             foreach ($ProductFiler as $key => $iteam) {
                 $interest = $iteam->price * $iteam->quantity;
@@ -184,7 +184,7 @@ $totalProduct = ExportShipmentDetail::whereBetween('created_at', [$from_date, $t
 
             $product = Product::where('status', '=', 1)->find($product_id);
             $quantity_import = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $product_id)->sum('quantity');
-$quantity_import_to_date = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $product_id)->sum('quantity');
+            $quantity_import_to_date = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $product_id)->sum('quantity');
 
             $quantity_export = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $product_id)->orderBy('created_at', 'ASC')->sum('quantity');
             $quantity_export_to_date = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $product_id)->sum('quantity');
@@ -226,7 +226,7 @@ $quantity_import_to_date = ImportShipmentDetail::query()->whereBetween('created_
                 $supplier_quantity_export_to_date = ExportShipment::whereBetween('export_date', [$from_date, $now])->where('supplier_id', '=', $iteam->id)->sum('quantity');
                 $supplier_quantity_import = ImportShipment::whereBetween('import_date', [$from_date, $to_date])->where('supplier_id', '=', $iteam->id)->get();
                 $supplier_quantity_import_to_date = ImportShipment::whereBetween('import_date', [$from_date, $now])->where('supplier_id', '=', $iteam->id)->sum('quantity');
-$beginning_inventory = $superlier_quantity_import_all - $superlier_quantity_export_all + $supplier_quantity_export_to_date - $supplier_quantity_import_to_date; // đầu
+                $beginning_inventory = $superlier_quantity_import_all - $superlier_quantity_export_all + $supplier_quantity_export_to_date - $supplier_quantity_import_to_date; // đầu
                 $ending_inventory = $beginning_inventory + $supplier_quantity_import->sum('quantity') - $supplier_quantity_export->sum('quantity'); // cuối
 
 
