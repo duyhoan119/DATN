@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UpdateUserResource;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,15 +15,11 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $keyword = $request->get('keyword');
+        $user = User::query()->when($request->keyword, function (Builder $query, string $keyword) {
+            $query->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
+        })->get();
 
-        if ($keyword) {
-            return Response()->json(User::where('status', '=', 1)->where('name', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        }else if($keyword){
-            return Response()->json(User::where('status', '=', 1)->where('email', 'like', '%' . $keyword . '%')->paginate(10), 200);
-        } else {
-            return Response()->json(User::where('status', '=', 1)->paginate(10), 200);
-        }
+        return $user;
     }
 
     public function save(UserRequest $request)
@@ -42,8 +40,8 @@ class UserController extends Controller
 
     public function uploadFile($file)
     {
-            $filename =  time() . '_' . $file->getClientOriginalName();
-            return $file->storeAs('imagesUser', $filename,  'public');
+        $filename =  time() . '_' . $file->getClientOriginalName();
+        return $file->storeAs('imagesUser', $filename,  'public');
     }
 
     public function getUser($id)
@@ -59,7 +57,8 @@ class UserController extends Controller
         return User::query()->find($id)->update($request->all());
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         if (!empty($id)) {
             $User = User::where('id', '=', $id);
             $data = [

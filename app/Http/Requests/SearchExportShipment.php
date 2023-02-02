@@ -28,7 +28,19 @@ class SearchExportShipment extends FormRequest
     public function rules()
     {
         return [
-            //
+            'keyword' => [
+                'nullable',
+                'string',
+                'max:20'
+            ]
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'keyword.string' => 'Từ khóa phải là kí tự',
+            'keyword.max' => 'Từ khóa phải ít hơn 20 kí tự'
         ];
     }
 
