@@ -9,7 +9,7 @@ use App\Http\Resources\ExportShipmentResource;
 use App\Models\ExportShipment;
 use App\Models\ExportShipmentDetail;
 use App\Models\Product;
-use App\Models\productDetail;
+use App\Models\ProductDetail;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -59,7 +59,11 @@ class ExportShipmentController extends Controller
 
                 $exportShipmentDetail = ExportShipmentDetail::query()->create($exportShipmentDetailData);
 
+<<<<<<< HEAD
                 $productDetail = productDetail::query()->where('product_id', $exportShipmentDetail->product_id)->where('lot_code', $exportShipmentDetail->lot_code)->first();
+=======
+                $productDetail = ProductDetail::query()->where('product_id', $exportShipmentDetail->product_id)->where('lot_code', $exportShipmentDetail->lot_code)->first();
+>>>>>>> baed45cfdfceb33bbac22f87f37355c7ba0de66c
                 $productDetail->quantity -= $exportShipmentDetail->quantity;
                 $productDetail->save();
 

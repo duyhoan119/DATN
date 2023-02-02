@@ -26,22 +26,21 @@ use App\Http\Controllers\StatisticalController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 Route::post('/login', [LoginController::class, 'Login']);
 Route::get('/login', [LoginController::class, 'index']);
 Route::get('/logout', [LoginController::class, 'Logout']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('staff')->prefix('products')->group(function () {
+        Route::get('/count-export', [ProductController::class, 'getCountExportShipment']);
         Route::get('/', [ProductController::class, 'index']);
         Route::post('/', [ProductController::class, 'save']);
         Route::get('/{id}', [ProductController::class, 'show']);
         Route::put('/{id}', [ProductController::class, 'store']);
+        Route::get('/detail/{id}', [ProductController::class, 'getProduct']);
         Route::get('product-detail/{id}', [ProductController::class, 'getProductDetail']);
         Route::delete('/{id}', [ProductController::class, 'delete']);
+        Route::get('/history/{id}', [ProductController::class, 'getProductHistory']);
     });
 
     // attributes
@@ -106,4 +105,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::get('/export-shipment', [OrderRefundController::class, 'SearchExportShipment']);
-}); 
+});
