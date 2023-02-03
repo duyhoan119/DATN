@@ -30,7 +30,7 @@ Route::post('/login', [LoginController::class, 'Login']);
 Route::get('/login', [LoginController::class, 'index']);
 Route::get('/logout', [LoginController::class, 'Logout']);
 
-Route::middleware(['auth:sanctum'])->group(function () {
+// Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('staff')->prefix('products')->group(function () {
         Route::get('/count-export', [ProductController::class, 'getCountExportShipment']);
         Route::get('/', [ProductController::class, 'index']);
@@ -90,12 +90,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ExportShipmentController::class, 'index']);
     });
 
-    Route::middleware('owner')->prefix('/statistical')->group(function () {
+    // Route::middleware('owner')->prefix('/statistical')->group(function () {
+        Route::prefix('/statistical')->group(function () {
         Route::get('/', [StatisticalController::class, 'show']);
         Route::post('/supplier', [StatisticalController::class, 'supplier']);
         Route::post('/product', [StatisticalController::class, 'product']);
         Route::post('/inventoryProduct', [StatisticalController::class, 'inventoryProduct']);
         Route::post('/inventorySupplier', [StatisticalController::class, 'inventorySupplier']);
+        Route::post('/inventoryCategory', [StatisticalController::class, 'inventoryCategory']);
     });
 
     Route::middleware('staff')->prefix('/refund-order')->group(function () {
@@ -105,4 +107,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::get('/export-shipment', [OrderRefundController::class, 'SearchExportShipment']);
-});
+// });
