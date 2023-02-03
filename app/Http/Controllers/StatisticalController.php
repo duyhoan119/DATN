@@ -244,11 +244,12 @@ class StatisticalController extends Controller
             $supplier_quantity_import = ImportShipment::whereBetween('import_date', [$from_date, $to_date])->where('supplier_id', '=', $supplier_id)->orderBy('import_date', 'ASC')->get();
             $supplier_quantity_import_to_date = ImportShipment::whereBetween('import_date', [$from_date, $now])->where('supplier_id', '=', $supplier_id)->orderBy('import_date', 'ASC')->sum('quantity');
 
+            $superlier_quantity = $superlier_quantity_import_all - $superlier_quantity_export_all;
             $beginning_inventory = $superlier_quantity_import_all - $superlier_quantity_export_all + $supplier_quantity_export_to_date - $supplier_quantity_import_to_date; // đầu
             $ending_inventory = $beginning_inventory + $supplier_quantity_import->sum('quantity') - $supplier_quantity_export->sum('quantity'); // cuối
 
 
-            $result[] = ['supplier' => $supplier, 'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
+            $result[] = ['supplier' => $supplier,'superlier_quantity' => $superlier_quantity,  'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
         }
         return json_encode($result);
     }
