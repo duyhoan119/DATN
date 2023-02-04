@@ -20,12 +20,14 @@ class StatisticalController extends Controller
     {
         $now = Carbon::now();
         $yesterday = Carbon::yesterday();
-        $DayOfWeek = $now->weekOfMonth;
+        $month_now = Carbon::now()->month;
+        $days7_ago = Carbon::now()->day(-7);
+        $now_year = $now->year;
 
-        $salesMoneyInMonth = ExportShipment::query()->where('status', '=', 1)->whereMonth('created_at', $now->month)->orderBy('created_at')->get();
-        $salesMoneyInYesterday = ExportShipment::query()->where('status', '=', 1)->whereDay('created_at', $yesterday->day)->sum('totall_price');
-        $salesMoneyInNow = ExportShipment::query()->where('status', '=', 1)->whereDay('created_at', $now->day)->sum('totall_price');
-        $salesMoneyInDayOfWeek = ExportShipment::query()->where('status', '=', 1)->whereMonth('export_date', $DayOfWeek)->sum('totall_price');
+        $salesMoneyInMonth = ExportShipment::query()->where('status', '=', 1)->whereMonth('created_at', $month_now)->orderBy('created_at')->get();
+        $salesMoneyInYesterday = ExportShipment::where('status', '=', 1)->whereDay('created_at', $yesterday->day)->whereMonth('created_at', $yesterday->month)->whereYear('created_at', $yesterday->year)->sum('totall_price');
+        $salesMoneyInNow = ExportShipment::where('status', '=', 1)->whereDay('created_at',  $now->day)->whereMonth('created_at', $month_now)->whereYear('created_at', $now_year)->sum('totall_price');
+        $salesMoneyInDayOfWeek = ExportShipment::where('status', '=', 1)->whereBetween('created_at', [$days7_ago, $now])->sum('totall_price');
 
         $funds = ImportShipment::sum('import_price_totail');
 
@@ -59,7 +61,6 @@ class StatisticalController extends Controller
                 ->get();
         }
 
-
         $result = [
             'sales_money_in_month' => $salesMoneyInMonth,
             'sales_in_month' => $salesInMonth,
@@ -71,8 +72,6 @@ class StatisticalController extends Controller
             'best_selling_products' => $bestSellingProducts,
             'most_profitable_products' => $mostProfitableProducts,
         ];
-
-
         return json_encode($result);
     }
 
@@ -227,11 +226,12 @@ class StatisticalController extends Controller
                 $supplier_quantity_export_to_date = ExportShipment::whereBetween('export_date', [$from_date, $now])->where('supplier_id', '=', $iteam->id)->sum('quantity');
                 $supplier_quantity_import = ImportShipment::whereBetween('import_date', [$from_date, $to_date])->where('supplier_id', '=', $iteam->id)->get();
                 $supplier_quantity_import_to_date = ImportShipment::whereBetween('import_date', [$from_date, $now])->where('supplier_id', '=', $iteam->id)->sum('quantity');
-                $beginning_inventory = $superlier_quantity_import_all - $superlier_quantity_export_all + $supplier_quantity_export_to_date - $supplier_quantity_import_to_date; // đầu
+
+                $superlier_quantity = $superlier_quantity_import_all - $superlier_quantity_export_all;
+                $beginning_inventory = $superlier_quantity + $supplier_quantity_export_to_date - $supplier_quantity_import_to_date; // đầu
                 $ending_inventory = $beginning_inventory + $supplier_quantity_import->sum('quantity') - $supplier_quantity_export->sum('quantity'); // cuối
 
-
-                $result[] = ['supplier' => $iteam, 'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
+                $result[] = ['supplier' => $iteam, 'superlier_quantity' => $superlier_quantity, 'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
             }
         } else {
             $supplier_id = $data['supplier_id'];
@@ -249,20 +249,18 @@ class StatisticalController extends Controller
             $ending_inventory = $beginning_inventory + $supplier_quantity_import->sum('quantity') - $supplier_quantity_export->sum('quantity'); // cuối
 
 
-            $result[] = ['supplier' => $supplier,'superlier_quantity' => $superlier_quantity,  'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
+            $result[] = ['supplier' => $supplier, 'superlier_quantity' => $superlier_quantity,  'beginning_inventory' => $beginning_inventory, 'ending_inventory' => $ending_inventory, 'supplier_import' => $supplier_quantity_import->sum('quantity'), 'supplier_export' => $supplier_quantity_export->sum('quantity')];
         }
         return json_encode($result);
     }
 
     public function inventoryCategory(Request $request)
     {
-
         $data = $request->all();
         $now = Carbon::now();
 
-
         if (empty($request->from_date && $request->to_date)) {
-            $from_date = Carbon::now()->month(-12);
+            $from_date = Carbon::now()->month(-3);
             $to_date = $now;
         } else {
             $from_date = $data['from_date'];
@@ -278,7 +276,6 @@ class StatisticalController extends Controller
                     $product = Product::where('category_id', '=', $iteam->category_id)->find($iteam->id);
                     $quantity_import = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->sum('quantity');
                     $quantity_import_to_date = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
-
                     $quantity_export = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->orderBy('created_at', 'ASC')->sum('quantity');
                     $quantity_export_to_date = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
 
@@ -297,7 +294,6 @@ class StatisticalController extends Controller
                     unset($value);
                 };
 
-
                 $result[] = ['category' => $category, 'category_quantity' => $category_quantity->sum('quantity'), 'export_import' => $export_import];
             }
         } else {
@@ -309,7 +305,6 @@ class StatisticalController extends Controller
                 $product = Product::where('category_id', '=', $iteam->category_id)->find($iteam->id);
                 $quantity_import = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->sum('quantity');
                 $quantity_import_to_date = ImportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
-
                 $quantity_export = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $to_date])->where('product_id', '=', $iteam->id)->orderBy('created_at', 'ASC')->sum('quantity');
                 $quantity_export_to_date = ExportShipmentDetail::query()->whereBetween('created_at', [$from_date, $now])->where('product_id', '=', $iteam->id)->sum('quantity');
 
