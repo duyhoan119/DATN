@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CheckLotcode;
 use App\Rules\CheckProductRule;
+use App\Rules\CheckQuantityRule;
 use App\Rules\CheckSupplierRule;
 use App\Rules\CheckUserRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -30,6 +32,7 @@ class ExportShipmentRequest extends FormRequest
      */
     public function rules()
     {
+        dd($this->request->get('products'));
         return [
             'export_date' => [
                 'required',
@@ -54,11 +57,15 @@ class ExportShipmentRequest extends FormRequest
             ],
             'products.*.quantity' => [
                 'integer',
-                'required'
+                'required',
             ],
             'products.*.price' => [
                 'integer',
                 'required'
+            ],
+            'products.*.lot_code' => [
+                'string',
+                'required',
             ]
         ];
     }
@@ -77,6 +84,9 @@ class ExportShipmentRequest extends FormRequest
 
             'products.*.price.integer' => 'Giá sản phẩm phải à số',
             'products.*.price.required' => 'Giá sản phẩm không được bỏ trống',
+
+            'products.*.lot_code.string' => 'Mã lô sản phẩm phải là 1 chuỗi kí tự',
+            'products.*.lot_code.required' => 'Vui lòng chọn lô của sản phẩm',
         ];
     }
 

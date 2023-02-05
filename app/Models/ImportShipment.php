@@ -10,6 +10,7 @@ class ImportShipment extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'supplier_id',
         'import_date',
         'quantity',
@@ -23,5 +24,10 @@ class ImportShipment extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function importShipmentDetails()
+    {
+        return $this->belongsTo(ImportShipmentDetail::class);
     }
 }

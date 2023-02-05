@@ -33,22 +33,12 @@ class StatisticalController extends Controller
 
         $bestSellingProducts = ExportShipmentDetail::select(
             'product_id',
-            DB::raw('SUM(export_shipment_details.quantity) as total_quantity')
+            DB::raw('SUM(export_shipment_details.quantity) as total_quantity,SUM(export_shipments.totall_price) as totall_price')
         )
             ->leftJoin('products', 'products.id', '=', 'export_shipment_details.product_id')
+            ->leftJoin('export_shipments', 'export_shipments.id', '=', 'export_shipment_details.export_shipment_id')
             ->groupBy('product_id')
             ->orderBy('total_quantity', 'desc')
-            ->limit(5)
-            ->with('product')
-            ->get();
-
-        $mostProfitableProducts = ExportShipmentDetail::select(
-            'product_id',
-            DB::raw('SUM(export_shipment_details.price * export_shipment_details.quantity) as total_price,COUNT(export_shipment_details.export_shipment_id) as totail_order,SUM(export_shipment_details.quantity) as quantity')
-        )
-            ->leftJoin('products', 'products.id', '=', 'export_shipment_details.product_id')
-            ->groupBy('product_id')
-            ->orderBy('total_price', 'desc')
             ->limit(5)
             ->with('product')
             ->get();
@@ -61,6 +51,12 @@ class StatisticalController extends Controller
                 ->get();
         }
 
+        $revenue = ExportShipment::select(
+            DB::raw('SUM(totall_price) as total_price, DATE(created_at) as date')
+        )
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->get();
+
         $result = [
             'sales_money_in_month' => $salesMoneyInMonth,
             'sales_in_month' => $salesInMonth,
@@ -70,8 +66,10 @@ class StatisticalController extends Controller
             'funds' => $funds,
             'product_totail' => $productTotail,
             'best_selling_products' => $bestSellingProducts,
-            'most_profitable_products' => $mostProfitableProducts,
+            'most_profitable_products' => $bestSellingProducts,
+            'revenue' => $revenue
         ];
+        
         return json_encode($result);
     }
 
@@ -86,9 +84,10 @@ class StatisticalController extends Controller
             ->limit(5)
             ->with('supplier')
             ->get();
+
         $import_price_totail = ImportShipment::select(
             'supplier_id',
-            DB::raw('SUM(import_shipments.import_price_totail) as import_price_totail,SUM(import_shipments.quantity) as quantity')
+            DB::raw('SUM(import_shipments.import_price_totail) as import_price_totail,SUM(import_shipments.quantity) as quantity ')
         )
             ->leftJoin('suppliers', 'suppliers.id', '=', 'import_shipments.supplier_id')
             ->groupBy('supplier_id')
@@ -116,8 +115,9 @@ class StatisticalController extends Controller
 
     public function product(Request $request)
     {
-        $ProductExportAll = ExportShipmentDetail::select('lot_code')->select(
+        $ProductExportAll = ExportShipmentDetail::select(
             'product_id',
+            'lot_code',
             DB::raw('SUM(export_shipment_details.price * export_shipment_details.quantity) as total_price,COUNT(export_shipment_details.export_shipment_id) as totail_order,SUM(export_shipment_details.quantity) as quantity')
         )
             ->leftJoin('products', 'products.id', '=', 'export_shipment_details.product_id')
@@ -146,6 +146,15 @@ class StatisticalController extends Controller
             $profit = $interest - $ProductDetail[0]['import_price'] * $totalProduct;
             $result = ['profit' => $profit, 'totalProduct' => $totalProduct, 'import_price' => $ProductDetail[0]['import_price'], 'product_filer' => $ProductFiler];
             return json_encode($result);
+        }
+        foreach ($ProductExportAll as $key => $value) {
+            $importPrice = ProductDetail::query()->where('product_id', $value->product_id)->where('lot_code', $value->lot_code)->first();
+            if (!$importPrice) {
+                $value->profit = 0;
+            } else {
+                $totallImport = (float) $value->quantity * (int) $importPrice->import_price;
+                $value->profit = (float)$value->total_price - (float) $totallImport;
+            }
         }
         $result = $ProductExportAll;
         return json_encode($result);

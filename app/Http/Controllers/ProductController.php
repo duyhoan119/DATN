@@ -27,7 +27,9 @@ class ProductController extends Controller
     {
         $product =  Product::query()->when($request->keyword, function (Builder $query, string $keyword) {
             $query->where('name', 'like', '%' . $keyword . '%')->orWhere('sku', 'like', '%' . $keyword . '%');
-        })->get();
+        })
+        ->with('Category')
+        ->get();
 
         return $product;
     }
