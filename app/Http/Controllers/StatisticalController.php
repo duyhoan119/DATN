@@ -69,7 +69,7 @@ class StatisticalController extends Controller
             'most_profitable_products' => $bestSellingProducts,
             'revenue' => $revenue
         ];
-        
+
         return json_encode($result);
     }
 
@@ -82,6 +82,7 @@ class StatisticalController extends Controller
             ->leftJoin('suppliers', 'suppliers.id', '=', 'export_shipments.supplier_id')
             ->groupBy('supplier_id')
             ->limit(5)
+            ->where('suppliers.status',1)
             ->with('supplier')
             ->get();
 
@@ -164,7 +165,6 @@ class StatisticalController extends Controller
     {
         $data = $request->all();
         $now = Carbon::now();
-
 
         if (empty($request->from_date && $request->to_date)) {
             $from_date = Carbon::now()->month(-3);

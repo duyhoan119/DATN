@@ -19,7 +19,7 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        return Supplier::all();
+        return Supplier::query()->where('status', 1)->get();
     }
 
     /**
@@ -81,5 +81,10 @@ class SupplierController extends Controller
             return true;
         }
         return false;;
+    }
+
+    public function getCustomers()
+    {
+        return Supplier::query()->where('status', 2)->get();
     }
 }

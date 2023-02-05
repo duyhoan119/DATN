@@ -32,7 +32,6 @@ class ExportShipmentRequest extends FormRequest
      */
     public function rules()
     {
-        dd($this->request->get('products'));
         return [
             'export_date' => [
                 'required',

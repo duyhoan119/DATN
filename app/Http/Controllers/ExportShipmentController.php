@@ -35,7 +35,8 @@ class ExportShipmentController extends Controller
         if ($ExportShipmentData['export_type'] === 2) {
             $insertSupplierData = [
                 'name' => $ExportShipmentData['user_name'],
-                'phone_number' => $ExportShipmentData['phone_number']
+                'phone_number' => $ExportShipmentData['phone_number'],
+                'status' => 2
             ];
             $supplier = Supplier::query()->create($insertSupplierData);
             $createExportShipmentData['supplier_id'] = $supplier->id;
@@ -58,12 +59,7 @@ class ExportShipmentController extends Controller
             foreach ($exportShipmentDetailDatas as $exportShipmentDetailData) {
 
                 $exportShipmentDetail = ExportShipmentDetail::query()->create($exportShipmentDetailData);
-
-<<<<<<< HEAD
-                $productDetail = productDetail::query()->where('product_id', $exportShipmentDetail->product_id)->where('lot_code', $exportShipmentDetail->lot_code)->first();
-=======
                 $productDetail = ProductDetail::query()->where('product_id', $exportShipmentDetail->product_id)->where('lot_code', $exportShipmentDetail->lot_code)->first();
->>>>>>> baed45cfdfceb33bbac22f87f37355c7ba0de66c
                 $productDetail->quantity -= $exportShipmentDetail->quantity;
                 $productDetail->save();
 

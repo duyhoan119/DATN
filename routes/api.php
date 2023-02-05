@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ImportShipmentController;
 use App\Http\Controllers\ProductController;
@@ -66,6 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/{id}', [AttributeProductController::class, 'delete']);
     });
 
+    Route::get('/customers', [SupplierController::class, 'getCustomers']);
     Route::middleware('staff')->resource('suppliers', SupplierController::class);
 
     Route::middleware('staff')->prefix('category')->group(function () {
@@ -89,7 +91,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     // Route::middleware('owner')->prefix('/statistical')->group(function () {
-        Route::prefix('/statistical')->group(function () {
+    Route::prefix('/statistical')->group(function () {
         Route::get('/', [StatisticalController::class, 'show']);
         Route::post('/product', [StatisticalController::class, 'product']);
         Route::post('/inventoryProduct', [StatisticalController::class, 'inventoryProduct']);
@@ -103,8 +105,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/', [OrderRefundController::class, 'store']);
         Route::get('/{refund_export_id}', [OrderRefundController::class, 'show']);
     });
-    Route::get('/export-shipment', [OrderRefundController::class, 'SearchExportShipment']);
-
+    Route::post('/export-shipment', [OrderRefundController::class, 'SearchExportShipment']);
 });
-
-

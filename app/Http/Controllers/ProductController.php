@@ -9,17 +9,12 @@ use App\Models\Product;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\productDetailResource;
 use App\Http\Resources\UpdateProductResource;
-<<<<<<< HEAD
 use App\Models\productDetail;
 use Illuminate\Database\Eloquent\Builder;
-=======
 use App\Models\ExportShipmentDetail;
 use App\Models\ImportShipmentDetail;
-use App\Models\ProductDetail;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
->>>>>>> baed45cfdfceb33bbac22f87f37355c7ba0de66c
 
 class ProductController extends Controller
 {

@@ -31,6 +31,8 @@ class RefundExportShipmentResource extends JsonResource
             'status' => $exportShipment->status,
             'export_type' => $exportShipment->export_type,
             'payment' => $exportShipment->payment,
+            'custumer' => $exportShipment->supplier,
+            'export_shipment_detail' => $exportShipment->exportShipmentDetails,
             'created_at' => $exportShipment->created_at ? Carbon::createFromFormat('Y-m-d H:i:s', $exportShipment->created_at)->format('d/m/Y') : '',
             'updated_at' => $exportShipment->updated_at ? Carbon::createFromFormat('Y-m-d H:i:s', $exportShipment->updated_at)->format('d/m/Y') : ''
         ]);

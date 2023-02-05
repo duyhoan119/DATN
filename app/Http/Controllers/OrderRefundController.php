@@ -110,9 +110,7 @@ class OrderRefundController extends Controller
             ->when($request['export_code'], function (Builder $query, $exportCode) {
                 $query->where('export_code', 'like', '%' . $exportCode . '%');
             })
-            ->when($request['lot_code'], function (Builder $query, $lotCode) {
-                return $query->whereRelation('lot_code', 'like', '%' . $lotCode . '%');
-            })->with('user', 'supplier')->get();
+            ->with('supplier','exportShipmentDetails')->get();
         return new RefundExportShipmentResource($exportShipment);
     }
 }
