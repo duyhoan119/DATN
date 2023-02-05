@@ -24,7 +24,8 @@ class ExportShipmentDetailResource extends JsonResource
                 'export_shipment_id' => $exportShipmentDetail->export_shipment_id,
                 'quantity' => $exportShipmentDetail->quantity,
                 'price' => $exportShipmentDetail->price,
-                'barcode' => $exportShipmentDetail->barcode,
+                'lot_code' => $exportShipmentDetail->lot_code,
+                'customer' => $exportShipmentDetail->ExportShipment->supplier,
                 'created_at' => $exportShipmentDetail->created_at ? Carbon::createFromFormat('Y-m-d H:i:s', $exportShipmentDetail->created_at)->format('d/m/Y') : '',
                 'updated_at' => $exportShipmentDetail->updated_at ? Carbon::createFromFormat('Y-m-d H:i:s', $exportShipmentDetail->updated_at)->format('d/m/Y') : ''
             ])

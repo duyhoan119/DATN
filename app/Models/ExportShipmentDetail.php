@@ -25,4 +25,9 @@ class ExportShipmentDetail extends Model
     {
         return $this->belongsTo(ProductDetail::class);
     }
+
+    public function ExportShipment()
+    {
+        return $this->belongsTo(ExportShipment::class);
+    }
 }

@@ -108,7 +108,7 @@ class ExportShipmentController extends Controller
 
     public function getDetail($export_id)
     {
-        $importShipmentDetail = ExportShipmentDetail::query()->where('export_shipment_id', $export_id)->with('product')->get();
-        return new ExportShipmentDetailResource($importShipmentDetail);
+        $exportShipmentDetail = ExportShipmentDetail::query()->where('export_shipment_id', $export_id)->with('product','ExportShipment.supplier')->get();
+        return new ExportShipmentDetailResource($exportShipmentDetail);
     }
 }

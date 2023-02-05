@@ -110,7 +110,7 @@ class OrderRefundController extends Controller
             ->when($request['export_code'], function (Builder $query, $exportCode) {
                 $query->where('export_code', 'like', '%' . $exportCode . '%');
             })
-            ->with('supplier','exportShipmentDetails')->get();
+            ->with('supplier','exportShipmentDetails','exportShipmentDetails.product')->get();
         return new RefundExportShipmentResource($exportShipment);
     }
 }
