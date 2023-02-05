@@ -119,6 +119,7 @@ class ImportShipmentController extends Controller
 
         return $result;
     }
+    
 
     protected function getLotCode($importShipmentId)
     {

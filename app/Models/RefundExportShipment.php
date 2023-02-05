@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class RefundExportShipment extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'export_shipment_id',
         'supplier_id',

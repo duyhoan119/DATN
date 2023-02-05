@@ -11,6 +11,7 @@ use App\Http\Controllers\ExportShipmentController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderRefundController;
+use App\Http\Controllers\RefundOrderSupplierController;
 use App\Http\Controllers\StatisticalController;
 
 
@@ -106,4 +107,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{refund_export_id}', [OrderRefundController::class, 'show']);
     });
     Route::post('/export-shipment', [OrderRefundController::class, 'SearchExportShipment']);
+
+    Route::middleware('staff')->prefix('/refund-supplier')->group(function () {
+        Route::get('/', [RefundOrderSupplierController::class, 'index']);
+        Route::post('/', [RefundOrderSupplierController::class, 'save']);
+        Route::get('/{id}', [RefundOrderSupplierController::class, 'show']);
+    });
 });

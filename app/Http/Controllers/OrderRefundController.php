@@ -48,7 +48,6 @@ class OrderRefundController extends Controller
         $createrefundExportShipmentData['refund_price_totail'] = array_sum($this->GetTotallPrice($products));
 
         if ($refundExportShipment = RefundExportShipment::query()->create($createrefundExportShipmentData)) {
-
             $refundExportShipmentDetailDatas = $this->getRefundExportShipmentDetailData($refundExportShipment->id, $request->products);
 
             foreach ($refundExportShipmentDetailDatas as $refundExportShipmentDetailData) {
